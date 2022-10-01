@@ -1,5 +1,6 @@
 
-def main():    
+
+def main(): #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)   
     while True:
         user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicators ""\n""")
         try:
@@ -34,30 +35,37 @@ def main():
                     if user_option_1 not in ["1", "2"]:
                         raise ValueError
                     else:
-                        if user_option_1 == "1":
-                            with open("test.csv", "r", encoding="utf-8") as file:
-                                employee_attritbutes = []
-                                employee_data = []
-                                for line in file:
-                                    employee_data.append(line.strip().split(","))
-                                employee_attritbutes = employee_data.pop(0)
-                                no_of_attributes = len(employee_attritbutes)
-                                print(employee_data)
-                                print(employee_attritbutes)   
+                        if user_option_1 == "1": #this assumes that "test".csv file is in same directory as current .py file and is named correctly
+                            try:
+                                with open("test.csv", "r", encoding="utf-8") as file:
+                                    employee_attritbutes = []
+                                    employee_data = []
+                                    for line in file:
+                                        employee_data.append(line.strip().split(","))
+                                    employee_attritbutes = employee_data.pop(0)
+                                    no_of_attributes = len(employee_attritbutes)
+                                    print(employee_data)
+                                    print(employee_attritbutes)
+                                    break
+                            except IOError:
+                                print("ERROR: Please make sure that 1).csv file is in the same directory as .py file and 2) .csv file is named correctly ""\n""Pls try again")
+                                continue   
 
-                                break
-                        elif user_option_1 == "2":
-                            with open("job.csv", "r", encoding="utf-8") as file:
-                                job_attributes = []
-                                job_data = []
-                                for line in file:
-                                    job_data.append(line.strip().split(","))
-                                job_attributes = job_data.pop(0)
-                                no_of_job_attributes = len(job_attributes)
-                                print(job_data)
-                                print(no_of_job_attributes) 
-                            
-                                break
+                        elif user_option_1 == "2": #this assumes that "job".csv file is in same directory as current .py file and is named correctly
+                            try:
+                                with open("job.csv", "r", encoding="utf-8") as file:
+                                    job_attributes = []
+                                    job_data = []
+                                    for line in file:
+                                        job_data.append(line.strip().split(","))
+                                    job_attributes = job_data.pop(0)
+                                    no_of_job_attributes = len(job_attributes)
+                                    print(job_data)
+                                    print(no_of_job_attributes)
+                                    break 
+                            except IOError:
+                                print("ERROR: Please make sure that 1).csv file is in the same directory as .py file and 2) .csv file is named correctly ""\n""Pls try again")
+                                continue                                
 
                 except ValueError:
                     while True:
@@ -68,7 +76,10 @@ def main():
                             break
                         else:
                             pass
-                break
+                if user_option_reselect == "Y":
+                    continue
+                elif user_option_reselect == "N":        
+                    break
                 
                     
                     
@@ -76,7 +87,7 @@ def main():
             
 
 
-        elif user_option == "2": #Add/Remove Employee(s)
+        elif user_option == "2": #Add/Remove Employee(s)/Update Job/Task
             pass
 
 
@@ -89,7 +100,7 @@ def main():
             pass
 
 
-        while True: #purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
+        while True: 
             user_option_continuation = input("Do you want to proceed with another action? Y/N ""\n""")
             if user_option_continuation in ["N", "Y"]:
                 break
