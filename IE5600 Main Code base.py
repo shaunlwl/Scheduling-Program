@@ -6,7 +6,7 @@ def main():
             if user_option not in ["1", "2", "3", "4"]:
                 raise ValueError
             else:
-                user_option = int(user_option)
+                pass
         except ValueError:
             while True:
                 user_option_reselect = input("You have entered an invalid selection, do you want to re-select? Y/N ""\n""")
@@ -15,8 +15,7 @@ def main():
                     try:
                         if user_option not in ["1", "2", "3", "4"]:
                             raise ValueError
-                        else:
-                            user_option = int(user_option)
+                        else:                            
                             break
                     except ValueError:
                         pass
@@ -28,7 +27,7 @@ def main():
 
 
 
-        if user_option == 1: #Upload Employee/Job Database from .csv file format only
+        if user_option == "1": #Upload Employee/Job Database from .csv file format only
             while True:
                 user_option_1 = input("Do you want to upload 1: Employee database or 2: Job database? Please input 1 or 2 ""\n""")
                 try:
@@ -37,20 +36,24 @@ def main():
                     else:
                         if user_option_1 == "1":
                             with open("test.csv", "r", encoding="utf-8") as file:
+                                employee_attritbutes = []
                                 employee_data = []
                                 for line in file:
-                                    employee_data.append(line.replace("\n", ",").split(","))
-                                no_of_attributes = len(employee_data[0]) - 1 #-1 due to additional white space from split(",")
+                                    employee_data.append(line.strip().split(","))
+                                employee_attritbutes = employee_data.pop(0)
+                                no_of_attributes = len(employee_attritbutes)
                                 print(employee_data)
-                                print(no_of_attributes)    
+                                print(employee_attritbutes)   
 
                                 break
                         elif user_option_1 == "2":
                             with open("job.csv", "r", encoding="utf-8") as file:
+                                job_attributes = []
                                 job_data = []
                                 for line in file:
-                                    job_data.append(line.replace("\n", ",").split(","))
-                                no_of_job_attributes = len(job_data[0]) - 1 #-1 due to additional white space from split(",")
+                                    job_data.append(line.strip().split(","))
+                                job_attributes = job_data.pop(0)
+                                no_of_job_attributes = len(job_attributes)
                                 print(job_data)
                                 print(no_of_job_attributes) 
                             
@@ -73,16 +76,16 @@ def main():
             
 
 
-        elif user_option == 2: #Add/Remove Employee(s)
+        elif user_option == "2": #Add/Remove Employee(s)
             pass
 
 
-        elif user_option == 3: #Schedule a Job
+        elif user_option == "3": #Schedule a Job
             pass
 
 
 
-        else: #Calculate Key Performance Indicators
+        elif user_option == "4": #Calculate Key Performance Indicators
             pass
 
 
