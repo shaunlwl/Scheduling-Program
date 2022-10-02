@@ -1,6 +1,8 @@
-
+import class_functions as cf
 
 def main(): #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)   
+    list_of_employees = []
+    list_of_jobs = []
     while True:
         user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicators ""\n""")
         try:
@@ -43,9 +45,8 @@ def main(): #Purpose of this while loop is to keep the programme running after t
                                     for line in file:
                                         employee_data.append(line.strip().split(","))
                                     employee_attritbutes = employee_data.pop(0)
-                                    no_of_attributes = len(employee_attritbutes)
-                                    print(employee_data)
-                                    print(employee_attritbutes)
+                                    for items in employee_data: # this assumes that the .csv file has the same columns in the right order always (refer to employee class __init__ ordering)
+                                        list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5]))
                                     break
                             except IOError:
                                 print("ERROR: Please make sure that 1).csv file is in the same directory as .py file and 2) .csv file is named correctly ""\n""Pls try again")
@@ -89,7 +90,7 @@ def main(): #Purpose of this while loop is to keep the programme running after t
 
         elif user_option == "2": #Add/Remove Employee(s)/Update Job/Task
             pass
-
+            
 
         elif user_option == "3": #Schedule a Job
             pass
