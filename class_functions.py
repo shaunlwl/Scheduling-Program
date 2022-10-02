@@ -7,19 +7,17 @@ class job:
     
     def __init__(self, job_id, job_name, start_date, due_date, resources, total_cost):
         
-        self.job_id = job_id
+        self.job_id = job_id #does not have to be in numerical format, can be string digits
         self.job_name = job_name
-        self.start_date = start_date
-        self.due_date = due_date
-        self.resources = resources
-        self.total_cost = total_cost
-        
-        # if self.job_id not in job_table["job_id"]:
-        #     job_table['job_id'].append(self.job_id)
-        #     job_table['start_date'].append(self.start_date)
-        #     job_table['due_date'].append(self.due_date)
-        #     job_table['resources'].append(self.resources)
-            
+        try:
+            self.start_date = start_date
+            self.due_date = due_date
+            self.resources = resources
+            self.total_cost = total_cost
+        except ValueError:
+            print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
+            raise IOError
+       
     
     def max_duration(self):
         
@@ -29,6 +27,7 @@ class job:
         delta = self.due_date - self.start_date
         
         return int(delta.total_seconds()/3600)
+
     
     # def remove(self):
         
@@ -48,20 +47,59 @@ class employee:
     
     def __init__(self, emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency):
         
-        self._emp_id = emp_id
+        self._emp_id = emp_id #does not have to be in numerical format, can be string digits
         self._first_name = first_name
         self._last_name = last_name
-        self._hourly_rate = float(hourly_rate)
-        self._total_hours_per_day = float(total_hours_per_day)
-        self._competency = float(competency)
-        
-        # if self._emp_id not in employee_table["emp_id"]:
-        #     employee_table['emp_id'].append(self._emp_id)
-        #     employee_table['first_name'].append(self._first_name)
-        #     employee_table['last_name'].append(self._last_name)
-        #     employee_table['hourly_rate'].append(self._hourly_rate)
-        #     employee_table["total_hours_per_day"].append(self._total_hours_per_day)            
-        #     employee_table['competency'].append(self._competency)
+        try:
+            self._hourly_rate = float(hourly_rate)
+            self._total_hours_per_day = float(total_hours_per_day)
+            self._competency = float(competency)
+        except ValueError:
+            print("ERROR: Employee attribute(s) that are expected to be numerical are not in the correct form, please change to numerical form""\n""")
+            raise IOError
+
+    def getEmpId(self):
+        return self._emp_id
+
+    def setEmpId(self,emp_id):
+        self._emp_id = emp_id
+
+    def getFirstName(self):
+        return self._first_name
+
+    def setFirstName(self,first_name):
+        self._first_name = first_name
+    
+    def getLastName(self):
+        return self._last_name
+
+    def setLastName(self,last_name):
+        self._last_name = last_name
+
+    def getHourlyRate(self):
+        return self._hourly_rate
+
+    def setHourlyRate(self,hourly_rate):
+        self._hourly_rate = hourly_rate
+
+    def getTotalHoursPerDay(self):
+        return self._total_hours_per_day
+
+    def setTotalHoursPerDay(self,total_hours_per_day):
+        self._total_hours_per_day = total_hours_per_day
+
+    def getCompetency(self):
+        return self._competency
+
+    def setCompetency(self,competency):
+        self._competency = competency
+
+    def ComputeAvgCompetency(list_of_employees):
+        total_competency =  0
+        for employees in list_of_employees:
+            total_competency += employees.getCompetency()
+        return total_competency/len(list_of_employees)      
+
             
     # def removeEmployee(self):
         
@@ -78,8 +116,7 @@ class employee:
     #     else:
     #         return print('ERROR: No such employee record found!')
         
-    def getEmpId(self):
-        return self._emp_id
+
     
 
         
