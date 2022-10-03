@@ -12,8 +12,8 @@ class job:
         try:
             self.start_date = start_date
             self.due_date = due_date
-            self.resources = resources
-            self.total_cost = total_cost
+            self.resources = float(resources)
+            self.total_cost = float(total_cost)
         except ValueError:
             print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
             raise IOError
@@ -98,7 +98,10 @@ class employee:
         total_competency =  0
         for employees in list_of_employees:
             total_competency += employees.getCompetency()
-        return total_competency/len(list_of_employees)      
+        return total_competency/len(list_of_employees)
+
+    def CurrentEmployeeCount(list_of_employees):
+        return len(list_of_employees)      
 
             
     # def removeEmployee(self):
