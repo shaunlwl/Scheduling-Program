@@ -1,7 +1,14 @@
-from datetime import datetime
+import datetime as dt
 
-# employee_table = {'emp_id':[], 'first_name':[], "last_name": [], "hourly_rate" : [], "total_hours_per_day" : [], 'competency':[] }
-# job_table = {'job_id':[], 'start_date':[], 'due_date':[], 'resources':[]}
+
+def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_employees):
+    '''This function initialises the date range for which our scheduling application works'''
+    sd = dt.datetime.strptime(start_date, '%Y-%m-%d')
+    ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
+    delta = ed - sd
+    for i in range(delta.days+1):
+        calendar_resource_dict[sd + dt.timedelta(days=i)] = list_of_employees
+    
 
 class job:
     
@@ -14,6 +21,7 @@ class job:
             self.due_date = due_date
             self.resources = float(resources)
             self.total_cost = float(total_cost)
+            self.employees = []
         except ValueError:
             print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
             raise IOError
@@ -21,8 +29,8 @@ class job:
     
     def max_duration(self):
         
-        self.start_date = datetime.strptime(self.start_date, "%Y/%m/%d %H:%M")
-        self.due_date = datetime.strptime(self.due_date, "%Y/%m/%d %H:%M")
+        self.start_date = dt.datetime.strptime(self.start_date, "%Y/%m/%d %H:%M")
+        self.due_date = dt.datetime.strptime(self.due_date, "%Y/%m/%d %H:%M")
         
         delta = self.due_date - self.start_date
         

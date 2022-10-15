@@ -1,8 +1,12 @@
 import class_functions as cf
+import datetime as dt
 
 def main():    
     list_of_employees = []
     list_of_jobs = []
+    calendar_resource_dict = {} #This data structure points to the daily resource available  
+    
+    
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
         user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) ""\n""")
         try:
@@ -51,8 +55,9 @@ def main():
                                     else:
                                         for items in employee_data: # this creates the employee objects and assumes that the .csv file has the same columns in the right order (refer to employee class __init__ ordering)
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5]))
-                                        print(list_of_employees[1]._emp_id)
-                                        print(cf.employee.ComputeAvgCompetency(list_of_employees))
+
+                                        cf.createCalendarRange("2022-01-01", "2026-12-31", calendar_resource_dict, list_of_employees)
+
                                         break
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical employee attributes are in correct form ""\n""Pls try again""\n""")
