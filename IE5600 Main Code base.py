@@ -57,7 +57,7 @@ def main():
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5]))
 
                                         cf.createCalendarRange("2022-01-01", "2026-12-31", calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2026
-
+                                        print(calendar_resource_dict)
                                         break
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical employee attributes are in correct form ""\n""Pls try again""\n""")

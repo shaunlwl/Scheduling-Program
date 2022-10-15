@@ -7,13 +7,37 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
     ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
     delta = ed - sd
     for i in range(delta.days+1):
-        calendar_resource_dict[sd + dt.timedelta(days=i)] = list_of_employees
-    
+        for employee in list_of_employees:
+            if sd + dt.timedelta(days=i) not in calendar_resource_dict:
+                calendar_resource_dict[sd + dt.timedelta(days=i)] = [{employee.getEmpId(): employee.getTotalHoursPerDay()}]
+            else:
+                calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId(): employee.getTotalHoursPerDay()})
 
 
-def scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict, current_job_id):
+def scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict, current_job_id, list_of_jobs):
     '''This function only runs when there is sufficient available resource within the time period of start date and due date, after function scheduleJobCheck is carried out'''
-    pass
+    job_id = "#" + str(current_job_id)
+    list_of_jobs.append(job(job_id, job_name, start_date, due_date, resources, total_cost))
+
+    while start_date < due_date + dt.timedelta(days=1) and resources !=0:
+        for employee in calendar_resource_dict[start_date]:
+            if sum(employee.values()) == 0:
+                continue
+            if sum(employee.values()) != 0 and resources >= sum(employee.values()):
+                resources = resources - sum(employee.values())
+                employee[list(employee.keys())[0]]= 0
+                if resources == 0:
+                    break
+                
+
+            else:
+                employee[list(employee.keys())[0]]= sum(employee.values()) - resources
+                resources = resources- resources
+                if resources == 0:
+                    break
+
+        start_date += dt.timedelta(days=1)
+    print(calendar_resource_dict)
 
 
 def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict):
@@ -24,7 +48,9 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, cale
         
     while current_date < due_date + dt.timedelta(days=1):
         for employee in calendar_resource_dict[current_date]:
-            total_available_hours_within_period += employee.getTotalHoursPerDay()
+            
+            total_available_hours_within_period += sum(employee.values())
+            
         current_date += dt.timedelta(days=1)
 
     if total_available_hours_within_period >= resources:
