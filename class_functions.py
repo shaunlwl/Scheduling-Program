@@ -15,24 +15,36 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
 
 
 def scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict, current_job_id, list_of_jobs):
-    '''This function only runs when there is sufficient available resource within the time period of start date and due date, after function scheduleJobCheck is carried out'''
+    '''This function only runs when there are sufficient resources within the time period of start date and due date, after function scheduleJobCheck is carried out'''
     job_id = "#" + str(current_job_id)
     list_of_jobs.append(job(job_id, job_name, start_date, due_date, resources, total_cost))
 
-    while start_date < due_date + dt.timedelta(days=1) and resources !=0:
+    while start_date <= due_date  and resources !=0:
         for employee in calendar_resource_dict[start_date]:
             if sum(employee.values()) == 0:
                 continue
             if sum(employee.values()) != 0 and resources >= sum(employee.values()):
                 resources = resources - sum(employee.values())
+                if start_date not in list_of_jobs[-1].employees.keys():
+                    list_of_jobs[-1].employees[start_date] = [{list(employee.keys())[0]: sum(employee.values())}]
+                else:
+                    list_of_jobs[-1].employees[start_date].append({list(employee.keys())[0]: sum(employee.values())})
+                
                 employee[list(employee.keys())[0]]= 0
+
                 if resources == 0:
                     break
                 
 
             else:
                 employee[list(employee.keys())[0]]= sum(employee.values()) - resources
+                if start_date not in list_of_jobs[-1].employees.keys():
+                    list_of_jobs[-1].employees[start_date] = [{list(employee.keys())[0]: resources}]
+                else:
+                    list_of_jobs[-1].employees[start_date].append({list(employee.keys())[0]: resources})
+                
                 resources = resources- resources
+                
                 if resources == 0:
                     break
 
@@ -74,7 +86,6 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, cale
 
 
 
-
 class job:
     
     def __init__(self, job_id, job_name, start_date, due_date, resources, total_cost):
@@ -86,34 +97,12 @@ class job:
             self.due_date = due_date
             self.resources = float(resources)
             self.total_cost = float(total_cost)
-            self.employees = []
+            self.employees = {}
         except ValueError:
             print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
             raise IOError
        
-    
-    def max_duration(self):
-        
-        self.start_date = dt.datetime.strptime(self.start_date, "%Y/%m/%d %H:%M")
-        self.due_date = dt.datetime.strptime(self.due_date, "%Y/%m/%d %H:%M")
-        
-        delta = self.due_date - self.start_date
-        
-        return int(delta.total_seconds()/3600)
-
-    
-    # def remove(self):
-        
-    #     if self.job_id in job_table['job_id']:
-    #         index = job_table['job_id'].index(self.job_id)
-    #         job_table['job_id'].pop(index)
-    #         job_table['start_date'].pop(index)
-    #         job_table['due_date'].pop(index)
-    #         job_table['resources'].pop(index)
-            
-    #     else:
-    #         return print('Record is not found!')
-        
+             
         
    
 class employee:
@@ -177,21 +166,7 @@ class employee:
         return len(list_of_employees)      
 
             
-    # def removeEmployee(self):
-        
-    #     if self._emp_id in employee_table['emp_id']:
-    #         index = employee_table['emp_id'].index(self._emp_id)
-    #         del_emp_id = employee_table['emp_id'].pop(index)
-    #         del_first_name = employee_table['first_name'].pop(index)
-    #         del_last_name = employee_table['last_name'].pop(index)
-    #         del employee_table['hourly_rate'][index] #do not use pop here as there is no need to return the deleted value
-    #         del employee_table['total_hours_per_day'][index]
-    #         del employee_table['competency'][index]
-    #         return print("Successfully removed " + del_emp_id + " " + del_first_name + " " + del_last_name + " from database.")
 
-    #     else:
-    #         return print('ERROR: No such employee record found!')
-        
 
     
 
