@@ -77,7 +77,7 @@ def main():
                                     else:                                        
                                         for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
                                             list_of_jobs.append(cf.job(items[0], items[1], items[2],items[3], items[4], items[5]))
-                                        print(list_of_jobs[1].job_name)
+                                        #print(list_of_jobs[1].job_name)
                                         break                                      
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical/Date type job attributes are in correct form ""\n""Pls try again""\n""")
@@ -108,7 +108,20 @@ def main():
             
 
         elif user_option == "3": #Schedule a Job
-            pass
+            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources required, Total cost""\n""").strip().split(",")
+            if len(user_job_details) != 5:
+                print("ERROR: You have entered an invalid amount of arguments, Please try again""\n""")
+            else:
+                for i in range(len(user_job_details)):
+                    user_job_details[i] = user_job_details[i].strip()
+                try:
+                    user_job_details[3] = float(user_job_details[3])
+                    user_job_details[4] = float(user_job_details[4])
+                except ValueError:
+                    print("ERROR: You have entered an invalid format for Resources or Total Cost, Please try again")
+                else:
+                    print(user_job_details)
+                    cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], calendar_resource_dict)
 
 
 
