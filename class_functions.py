@@ -11,38 +11,37 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
     
 
 
-def scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict):
+def scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict, current_job_id):
+    '''This function only runs when there is sufficient available resource within the time period of start date and due date, after function scheduleJobCheck is carried out'''
     pass
 
 
 def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict):
     total_available_hours_within_period = 0
-    try:
-        current_date = dt.datetime.strptime(start_date,'%Y-%m-%d')
-        due_date = dt.datetime.strptime(due_date,'%Y-%m-%d')
-    except ValueError:
-        print("You have entered an invalid date format, Please try again""\n""")
-        return
-    else:    
-        while current_date < due_date + dt.timedelta(days=1):
-            for employee in calendar_resource_dict[current_date]:
-                total_available_hours_within_period += employee.getTotalHoursPerDay()
-            current_date += dt.timedelta(days=1)
-        if total_available_hours_within_period >= resources:
-            while True:
-                user_input = input("Job can be scheduled, do you want to proceed? Y/N""\n""")
-                if user_input in ["Y", "N"]:
-                    break
-                else:
-                    print("ERROR: You have entered an invalid selection, Please try again""\n""")
-            if user_input == "Y":
-                #scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict)
-                pass
-            else:
-                return
-        else:
-            print("Job cannot be scheduled due to unavailable resources")
+    
+    current_date = start_date
 
+        
+    while current_date < due_date + dt.timedelta(days=1):
+        for employee in calendar_resource_dict[current_date]:
+            total_available_hours_within_period += employee.getTotalHoursPerDay()
+        current_date += dt.timedelta(days=1)
+
+    if total_available_hours_within_period >= resources:
+        while True:
+            user_input = input("Job can be scheduled, do you want to proceed? Y/N""\n""")
+            if user_input in ["Y", "N"]:
+                break
+            else:
+                print("ERROR: You have entered an invalid selection, Please try again""\n""")
+        if user_input == "Y":
+            return True
+                
+        else:
+            return False
+    else:
+        print("Job cannot be scheduled due to unavailable resources")
+        return False
 
 
 

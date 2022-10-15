@@ -4,8 +4,8 @@ import datetime as dt
 def main():    
     list_of_employees = []
     list_of_jobs = []
-    calendar_resource_dict = {} #This data structure points to the daily resource available  
-    
+    calendar_resource_dict = {} #This data structure will store the daily resource available
+    job_id = 1000 #initialises first job id to 1000
     
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
         user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) ""\n""")
@@ -56,7 +56,7 @@ def main():
                                         for items in employee_data: # this creates the employee objects and assumes that the .csv file has the same columns in the right order (refer to employee class __init__ ordering)
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5]))
 
-                                        cf.createCalendarRange("2022-01-01", "2026-12-31", calendar_resource_dict, list_of_employees)
+                                        cf.createCalendarRange("2022-01-01", "2026-12-31", calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2026
 
                                         break
                             except IOError:
@@ -77,7 +77,7 @@ def main():
                                     else:                                        
                                         for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
                                             list_of_jobs.append(cf.job(items[0], items[1], items[2],items[3], items[4], items[5]))
-                                        #print(list_of_jobs[1].job_name)
+                                        
                                         break                                      
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical/Date type job attributes are in correct form ""\n""Pls try again""\n""")
@@ -120,10 +120,19 @@ def main():
                 except ValueError:
                     print("ERROR: You have entered an invalid format for Resources or Total Cost, Please try again")
                 else:
-                    print(user_job_details)
-                    cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], calendar_resource_dict)
+                    try:
+                        user_job_details[1] = dt.datetime.strptime(user_job_details[1],'%Y-%m-%d')
+                        user_job_details[2] = dt.datetime.strptime(user_job_details[2],'%Y-%m-%d')
+                    
+                    except ValueError:
+                        print("You have entered an invalid date format, Please try again""\n""")
+                    else:
 
-
+                        print(user_job_details)
+                        check_results = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], calendar_resource_dict)
+                        if check_results == True:
+                            cf.scheduleJob(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], calendar_resource_dict, job_id, list_of_jobs)
+                            job_id += job_id
 
         elif user_option == "4": #Calculate Key Performance Indicators
             pass
