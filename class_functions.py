@@ -76,13 +76,18 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, cale
             return True
                 
         else:
-            return False
+            return None
     else:
         print("Job cannot be scheduled due to unavailable resources")
         return False
 
 
-
+def recommendSchedule(resources, start_date, due_date, calendar_resource_dict):
+    while resources != 0:
+        for employee in calendar_resource_dict[current_date]:
+            pass
+        
+    
 
 
 
