@@ -49,7 +49,7 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, calendar_
                     break
 
         start_date += dt.timedelta(days=1)
-    print(calendar_resource_dict)
+
 
 
 def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, calendar_resource_dict):
