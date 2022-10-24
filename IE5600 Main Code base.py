@@ -4,7 +4,7 @@ import datetime as dt
 def main():    
     list_of_employees = []
     list_of_jobs = []
-    calendar_resource_dict = {} #This data structure will store the daily resource available
+    calendar_resource_dict = {} #This data structure will store the daily resource available by date as key
     job_id = 1000 #initialises first job id to 1000
     
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
@@ -16,8 +16,8 @@ def main():
                 pass
         except ValueError:
             while True:
-                user_option_reselect = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""")
-                if user_option_reselect == "Y":
+                user_option_reselect = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
+                if user_option_reselect == "y":
                     user_option= input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicators ""\n""")
                     try:
                         if user_option not in ["1", "2", "3", "4"]:
@@ -26,7 +26,7 @@ def main():
                             break
                     except ValueError:
                         pass
-                elif user_option_reselect == "N":
+                elif user_option_reselect == "n":
                     break
                 else:
                     pass
@@ -43,18 +43,18 @@ def main():
                     else:
                         if user_option_1 == "1": 
                             try:
-                                with open("test.csv", "r", encoding="utf-8") as file:
+                                with open("employee.csv", "r", encoding="utf-8") as file:
                                     employee_attritbutes = []
                                     employee_data = []
                                     for line in file:
                                         employee_data.append(line.strip().split(","))
                                     employee_attritbutes = employee_data.pop(0)
-                                    if len(employee_attritbutes) != 6: #checks that the .csv file has six columns for instantiation of employee class type
-                                        print("ERROR: Data from .csv file does not match expected input of six employee attributes, please try again""\n""")
+                                    if len(employee_attritbutes) != 7: #checks that the .csv file has seven columns for instantiation of employee class type
+                                        print("ERROR: Data from .csv file does not match expected input of seven employee attributes, please try again""\n""")
                                         continue
                                     else:
                                         for items in employee_data: # this creates the employee objects and assumes that the .csv file has the same columns in the right order (refer to employee class __init__ ordering)
-                                            list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5]))
+                                            list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
 
                                         cf.createCalendarRange("2022-01-01", "2026-12-31", calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2026
                                         print(calendar_resource_dict)
@@ -71,12 +71,12 @@ def main():
                                     for line in file:
                                         job_data.append(line.strip().split(","))
                                     job_attributes = job_data.pop(0)
-                                    if len(job_attributes) != 6:
-                                        print("ERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
+                                    if len(job_attributes) != 7:
+                                        print("ERROR: Data from .csv file does not match expected input of seven job attributes, please try again""\n""")
                                         continue
                                     else:                                        
                                         for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
-                                            list_of_jobs.append(cf.job(items[0], items[1], items[2],items[3], items[4], items[5]))
+                                            list_of_jobs.append(cf.job(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
                                         
                                         break                                      
                             except IOError:
@@ -85,16 +85,16 @@ def main():
 
                 except ValueError:
                     while True:
-                        user_option_reselect = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""")
-                        if user_option_reselect == "Y":
+                        user_option_reselect = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
+                        if user_option_reselect == "y":
                             break
-                        elif user_option_reselect == "N":
+                        elif user_option_reselect == "n":
                             break
                         else:
                             pass
-                if user_option_reselect == "Y":
+                if user_option_reselect == "y":
                     continue
-                elif user_option_reselect == "N":        
+                elif user_option_reselect == "n":        
                     break
                 
                     
@@ -108,8 +108,8 @@ def main():
             
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources required, Total cost""\n""").strip().split(",")
-            if len(user_job_details) != 5:
+            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required, Total cost, Craft Required""\n""").strip().split(",")
+            if len(user_job_details) != 6:
                 print("ERROR: You have entered an invalid amount of arguments, Please try again""\n""")
             else:
                 for i in range(len(user_job_details)):
@@ -127,25 +127,24 @@ def main():
                     except ValueError:
                         print("You have entered an invalid date format, Please try again""\n""")
                     else:
-
-                        print(user_job_details)
-                        check_results = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], calendar_resource_dict)
+                     
+                        check_results = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict)
                         if check_results == True:
-                            cf.scheduleJob(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], calendar_resource_dict, job_id, list_of_jobs)
-                            job_id += job_id
+                            cf.scheduleJob(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
+                            job_id += 1
 
         elif user_option == "4": #Calculate Key Performance Indicators
-            pass
+            print(list_of_jobs)
 
 
         while True: 
-            user_option_continuation = input("Do you want to proceed with another action? Y/N ""\n""")
-            if user_option_continuation in ["N", "Y"]:
+            user_option_continuation = input("Do you want to proceed with another action? Y/N ""\n""").lower()
+            if user_option_continuation in ["n", "y"]:
                 break
             else:
                 print("ERROR: You have entered an invalid selection, please try again""\n""")
                 continue
-        if user_option_continuation == "Y":
+        if user_option_continuation == "y":
             continue
         else: #breaks out of the most outer while loop and the programme stops
             break
