@@ -4,7 +4,7 @@ import datetime as dt
 def main():    
     calendar_start_date = "2022-01-01"
     calendar_end_date = "2032-12-31"
-    list_of_employees = []
+    list_of_employees = [] # This list shows current list of employees and includes any known employee that will join in the future but excludes any employee that has submitted a Last Day of Work
     list_of_jobs = []
     calendar_resource_dict = {} #This data structure will store the daily resource available by date as key
     job_id = 1000 #initialises first job id to 1000
@@ -124,7 +124,7 @@ def main():
                                 if user_option_reselect in ["y", "n"]:
                                     break
                                 else:
-                                    user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                    user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
                                     continue
                             if user_option_reselect == "y":
                                 continue
@@ -142,7 +142,7 @@ def main():
                                     if user_option_reselect in ["y", "n"]:
                                         break
                                     else:
-                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
                                         continue
                                 if user_option_reselect == "y":
                                     continue
@@ -160,7 +160,7 @@ def main():
                                     if user_option_reselect in ["y", "n"]:
                                         break
                                     else:
-                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
                                         continue
                                 if user_option_reselect == "y":
                                     continue
@@ -182,7 +182,7 @@ def main():
                                         if user_option_reselect in ["y", "n"]:
                                             break
                                         else:
-                                            user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                            user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
                                             continue
                                     if user_option_reselect == "y":
                                         continue
@@ -190,18 +190,119 @@ def main():
                                         break
                     if employee_input_cleaned == True:
                         cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_employees, calendar_resource_dict, calendar_end_date)                   
-                        print(calendar_resource_dict)
+                        
 
 
 
-                elif user_option_2 == "2": #Remove Employee
-                    pass
+                elif user_option_2 == "2": # Remove Employee
+                    while True:
+                        employee_details = input("Please key in Employee ID and Last Day of Work (yyyy-mm-dd) with commas separating each input""\n""").strip().split(",")
+                        if len(employee_details) != 2:
+                            print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+                            user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
+                            while True:
+                                if user_option_reselect in ["y", "n"]:
+                                    break
+                                else:
+                                    user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
+                                    continue
+                            if user_option_reselect == "y":
+                                continue
+                            else:
+                                break
+                        
+                        else:
+                            for i in range(len(employee_details)):
+                                employee_details[i] = employee_details[i].strip()    
+                            employee_end_before_calendar_end = True
+
+                            try:
+                                
+                                employee_details[1] = dt.datetime.strptime(employee_details[1],'%Y-%m-%d')
+                                if employee_details[1] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'):
+                                    print("Employee's Last Day of Work is past Resource Application workable date of 31st December 2032, Employee will not be removed from Database in this scenario")
+                                    employee_end_before_calendar_end = False
+                            except ValueError:
+                                print("ERROR: You have entered an invalid date format for Last Day of Work, Please try again""\n""")
+                                user_option_reselect= input("Do you want to re-input employee details? Y/N""\n""").lower()
+                                while True:
+                                    if user_option_reselect in ["y", "n"]:
+                                        break
+                                    else:
+                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
+                                        continue
+                                if user_option_reselect == "y":
+                                    continue
+                                else:
+                                    break   
+                            else:        
+                                try:
+                                    employee_details[0] = int(employee_details[0])
+                                except ValueError:
+                                    print("ERROR: Please check input for Employee ID, expected input are numerical digits, Please try again""\n""")
+                                    user_option_reselect= input("Do you want to re-input employee details? Y/N""\n""").lower()
+                                    while True:
+                                        if user_option_reselect in ["y", "n"]:
+                                            break
+                                        else:
+                                            user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
+                                            continue
+                                    if user_option_reselect == "y":
+                                        continue
+                                    else:
+                                        break   
+                                else:
+                                    employee_exist_in_database = False
+                                    count = 0
+                                    for employee in list_of_employees:
+                                        if employee_details[0] == employee.getEmpId():
+                                            employee_exist_in_database = True
+                                            index= count
+                                            break
+                                        else:
+                                            count +=1
+                                            continue
+                                    if employee_exist_in_database == True and employee_end_before_calendar_end == True:
+                                        confirm_deletion = input("Do you confirm removal of employee from database with Employee ID: " + str(employee_details[0]) + "? Y/N""\n""").lower()
+                                        while True:
+                                            if confirm_deletion in ["y", "n"]:
+                                                break
+                                            else:
+                                                confirm_deletion = input("ERROR: You have entered an invalid selection, Do you confirm removal of employee from database? Y/N""\n""").lower()
+                                                continue
+                                        if confirm_deletion == "y":
+                                            cf.employee.removeEmployee(employee_details[0],employee_details[1], index, list_of_employees, calendar_resource_dict, calendar_end_date, list_of_jobs)
+                                            break
+
+                                            
+                                        else:
+                                            break
 
 
 
-                else: #Update Scheduled Job details
+
+                                    elif employee_exist_in_database == False:
+                                        print("ERROR: Employee ID does not exist in current database, Please try again""\n""")
+                                        user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
+                                        while True:
+                                            if user_option_reselect in ["y", "n"]:
+                                                break
+                                            else:
+                                                user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
+                                                continue
+                                        if user_option_reselect == "y":
+                                            continue
+                                        else:
+                                            break
+
+
+
+
+                else: # Update Scheduled Job details
                     pass
             
+
+
 
         elif user_option == "3": #Schedule a Job
             user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required, Total cost, Craft Required""\n""").strip().split(",")
@@ -214,7 +315,7 @@ def main():
                     user_job_details[3] = float(user_job_details[3])
                     user_job_details[4] = float(user_job_details[4])
                 except ValueError:
-                    print("ERROR: You have entered an invalid format for Resources or Total Cost, Please try again")
+                    print("ERROR: You have entered an invalid format for Resources or Total Cost, Please try again""\n""")
                 else:
                     try:
                         user_job_details[1] = dt.datetime.strptime(user_job_details[1],'%Y-%m-%d')
