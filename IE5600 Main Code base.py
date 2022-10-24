@@ -2,6 +2,8 @@ import class_functions as cf
 import datetime as dt
 
 def main():    
+    calendar_start_date = "2022-01-01"
+    calendar_end_date = "2032-12-31"
     list_of_employees = []
     list_of_jobs = []
     calendar_resource_dict = {} #This data structure will store the daily resource available by date as key
@@ -34,7 +36,7 @@ def main():
 
 
 
-        if user_option == "1": #Upload Employee/Job Database from .csv file format only
+        if user_option == "1": #Upload Employee/Job Database from .csv file format only (Note: Option 1 must always be run first to initialise the Resource Calendar)
             while True:
                 user_option_1 = input("Do you want to upload 1: Employee database or 2: Job database? Please input 1 or 2 ""\n""")
                 try:
@@ -56,7 +58,7 @@ def main():
                                         for items in employee_data: # this creates the employee objects and assumes that the .csv file has the same columns in the right order (refer to employee class __init__ ordering)
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
 
-                                        cf.createCalendarRange("2022-01-01", "2026-12-31", calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2026
+                                        cf.createCalendarRange(calendar_start_date, calendar_end_date, calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2032
                                         print(calendar_resource_dict)
                                         break
                             except IOError:
@@ -104,13 +106,107 @@ def main():
 
 
         elif user_option == "2": #Add/Remove Employee(s)/Update Job/Task
-            pass
+            user_option_2 = input("Do you want to:""\n""1 : Add an Employee to Database ""\n""2 : Remove an Employee from Database ""\n""3 : Update existing Job details""\n""")
+            if user_option_2 not in ["1", "2", "3"]:
+                print("ERROR: You have entered an invalid selection, Please try again")
+                continue
+
+            else:
+                
+                if user_option_2 == "1":
+                    employee_input_cleaned = False
+                    while True:
+                        employee_details = input("Please provide the following details, separated by commas: Employee ID, First Name, Last Name, Hourly Rate, Total Hours Per Day, Competency, Craft, Employee Start Date in yyyy-mm-dd""\n""").strip().split(",")
+                        if len(employee_details) != 8:
+                            print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+                            user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
+                            while True:
+                                if user_option_reselect in ["y", "n"]:
+                                    break
+                                else:
+                                    user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                    continue
+                            if user_option_reselect == "y":
+                                continue
+                            else:
+                                break
+
+                        else:
+                            for i in range(len(employee_details)):
+                                employee_details[i] = employee_details[i].strip()
+
+                            if employee_details[6].lower() not in ["metals", "machinery", "instrument/electrical"]:
+                                print("ERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical")
+                                user_option_reselect= input("Do you want to re-input? Y/N""\n""").lower()
+                                while True:
+                                    if user_option_reselect in ["y", "n"]:
+                                        break
+                                    else:
+                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                        continue
+                                if user_option_reselect == "y":
+                                    continue
+                                else:
+                                    break
+                            try:
+                                employee_details[0] = int(employee_details[0])
+                                employee_details[3] = float(employee_details[3])
+                                employee_details[4] = float(employee_details[4])
+                                employee_details[5] = float(employee_details[5])
+                            except ValueError:
+                                print("ERROR: Please check inputs for Employee Id, Hourly Rate, Total hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
+                                user_option_reselect= input("Do you want to re-input employee details? Y/N""\n""").lower()
+                                while True:
+                                    if user_option_reselect in ["y", "n"]:
+                                        break
+                                    else:
+                                        user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                        continue
+                                if user_option_reselect == "y":
+                                    continue
+                                else:
+                                    break
+                            else:
+                                try:
+                                    employee_details[7] = dt.datetime.strptime(employee_details[7],'%Y-%m-%d')
+                                    if employee_details[7] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'):
+                                        print("Employee is planned to start past Resource Application workable date of 31st December 2032, Employee will not be added to Database in this scenario")
+                                        
+                                    else:
+                                        employee_input_cleaned = True
+                                    break
+                                except ValueError:
+                                    print("ERROR: You have entered an invalid date format for Employee Start Date, Please try again""\n""")
+                                    user_option_reselect= input("Do you want to re-input employee details? Y/N""\n""").lower()
+                                    while True:
+                                        if user_option_reselect in ["y", "n"]:
+                                            break
+                                        else:
+                                            user_option_reselect = input("ERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N").lower()
+                                            continue
+                                    if user_option_reselect == "y":
+                                        continue
+                                    else:
+                                        break
+                    if employee_input_cleaned == True:
+                        cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_employees, calendar_resource_dict, calendar_end_date)                   
+                        print(calendar_resource_dict)
+
+
+
+                elif user_option_2 == "2": #Remove Employee
+                    pass
+
+
+
+                else: #Update Scheduled Job details
+                    pass
             
 
         elif user_option == "3": #Schedule a Job
             user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required, Total cost, Craft Required""\n""").strip().split(",")
             if len(user_job_details) != 6:
-                print("ERROR: You have entered an invalid amount of arguments, Please try again""\n""")
+                print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
             else:
                 for i in range(len(user_job_details)):
                     user_job_details[i] = user_job_details[i].strip()
@@ -125,7 +221,7 @@ def main():
                         user_job_details[2] = dt.datetime.strptime(user_job_details[2],'%Y-%m-%d')
                     
                     except ValueError:
-                        print("You have entered an invalid date format, Please try again""\n""")
+                        print("ERROR: You have entered an invalid date format, Please try again""\n""")
                     else:
                      
                         check_results = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict)

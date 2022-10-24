@@ -126,10 +126,10 @@ class employee:
     
     def __init__(self, emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft):
         
-        self._emp_id = emp_id #does not have to be in numerical format, can be string digits
         self._first_name = first_name
         self._last_name = last_name
         try:
+            self._emp_id = int(emp_id)
             self._hourly_rate = float(hourly_rate)
             self._total_hours_per_day = float(total_hours_per_day)
             self._competency = float(competency)
@@ -177,21 +177,39 @@ class employee:
     def setCompetency(self,competency):
         self._competency = competency
 
+    @staticmethod
     def ComputeAvgCompetency(list_of_employees):
         total_competency =  0
         for employees in list_of_employees:
             total_competency += employees.getCompetency()
         return total_competency/len(list_of_employees)
 
+    @staticmethod
     def CurrentEmployeeCount(list_of_employees):
         return len(list_of_employees)      
 
+    @staticmethod      
+    def addEmployee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft, start_date, list_of_employees, calendar_resource_dict, calendar_end_date):
+        '''This method appends a new employee to the current employee list and adds this new employee to the resource tracked in the Calendar. This method should only be called when Calendar Resource Dict has been initialised with the crateCalendarRange function'''
+        list_of_employees.append(employee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft))
+        sd = start_date
+        ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')
+        delta = ed - sd
+        for i in range(delta.days +1):
+            if sd+ dt.timedelta(days=i) not in calendar_resource_dict:
+                calendar_resource_dict[sd + dt.timedelta(days=i)] = [{list_of_employees[-1].getEmpId(): list_of_employees[-1].getTotalHoursPerDay(), "Craft" : list_of_employees[-1].getCraft().capitalize()}]
+            else:
+                calendar_resource_dict[sd + dt.timedelta(days=i)].append({list_of_employees[-1].getEmpId():list_of_employees[-1].getTotalHoursPerDay(), "Craft" : list_of_employees[-1].getCraft().capitalize()})
+    
+
+    def removeEmployee(emp_id, last_day ,index, list_of_employees, calendar_resource_dict, calendar_end_date):
+        del list_of_employees[index]
+        sd = last_day
+        ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')
+        delta = ed - sd
+        for i in range(delta.days +1):
+            for employees in calendar_resource_dict[sd + dt.timedelta(days=i)]:
+                if list(employees.keys())[0] == emp_id:
+                    calendar_resource_dict[sd + dt.timedelta(days=i)].remove(employees)
+        #still need to consider checking list of current jobs and alerting user
             
-
-
-    
-
-        
-
-    
-
