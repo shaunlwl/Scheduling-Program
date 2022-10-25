@@ -202,8 +202,8 @@ class employee:
                 calendar_resource_dict[sd + dt.timedelta(days=i)].append({list_of_employees[-1].getEmpId():list_of_employees[-1].getTotalHoursPerDay(), "Craft" : list_of_employees[-1].getCraft().capitalize()})
     
     @staticmethod
-    def removeEmployee(emp_id, last_day ,index, list_of_employees, calendar_resource_dict, calendar_end_date):
-        del list_of_employees[index]
+    def removeEmployee(emp_id, last_day ,index, list_of_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
+        del list_of_employees[index] # Remove employee from list of employees (although it is not Last Day of Work yet)
         sd = last_day + dt.timedelta(days=1) #Employee is still considered working on Last Day of Work
         ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')  
         delta = ed - sd
@@ -211,5 +211,20 @@ class employee:
             for employees in calendar_resource_dict[sd + dt.timedelta(days=i)]:
                 if list(employees.keys())[0] == emp_id:
                     calendar_resource_dict[sd + dt.timedelta(days=i)].remove(employees) # Removes this particular employee resource from all dates starting from Last Day of Work
-        #still need to consider checking list of current jobs and alerting user of those that this employee affect
+
+     #havent tested this portion of code below yet!!!   
+        list_of_affected_jobs = []
+        for job in list_of_jobs:
+            for dates in list(job.employees.keys()):
+                if dates < sd:
+                    continue
+                else:
+                    for employee in job.employees[dates]:
+                        if list(employee.keys())[0] == emp_id:
+                            list_of_affected_jobs.append(job)
+        for job in list_of_affected_jobs:
+            print(job.job_id)
+
+    #still need to consider checking list of current jobs and alerting user of those that this employee affect
             
+
