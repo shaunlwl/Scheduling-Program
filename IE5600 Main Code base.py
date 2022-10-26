@@ -170,7 +170,7 @@ def main():
                                 try:
                                     employee_details[7] = dt.datetime.strptime(employee_details[7],'%Y-%m-%d')
                                     if employee_details[7] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'):
-                                        print("Employee is planned to start past Resource Application workable date of 31st December 2032, Employee will not be added to Database in this scenario")
+                                        print("Employee is planned to start past Resource Application workable date of {}, Employee will not be added to Database in this scenario".format(calendar_end_date))
                                         
                                     else:
                                         employee_input_cleaned = True
@@ -220,7 +220,7 @@ def main():
                                 
                                 employee_details[1] = dt.datetime.strptime(employee_details[1],'%Y-%m-%d')
                                 if employee_details[1] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'):
-                                    print("Employee's Last Day of Work is past Resource Application workable date of 31st December 2032, Employee will not be removed from Database in this scenario")
+                                    print("Employee's Last Day of Work is past Resource Application workable date of {}, Employee will not be removed from Database in this scenario".format(calendar_end_date))
                                     employee_end_before_calendar_end = False
                             except ValueError:
                                 print("ERROR: You have entered an invalid date format for Last Day of Work, Please try again""\n""")
@@ -305,7 +305,7 @@ def main():
 
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required, Total cost, Craft Required""\n""").strip().split(",")
+            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required (in hours), Total cost, Craft Required""\n""").strip().split(",")
             if len(user_job_details) != 6:
                 print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
             else:

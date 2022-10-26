@@ -14,8 +14,14 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
                 calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId():employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()})
 
 
+
+
+
+
+
 def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,calendar_resource_dict, current_job_id, list_of_jobs):
     '''This function only runs when there are sufficient resources within the time period of start date and due date and user confirms schedule (i.e scheduleJobCheck returns True)'''
+    
     job_id = "#" + str(current_job_id)
     list_of_jobs.append(job(job_id, job_name, start_date, due_date, resources, total_cost, craft))
     job_start_date = start_date
@@ -58,9 +64,12 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
         print("Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
 
     #Check that job has been scheduled properly)
-    print(calendar_resource_dict)
     print(list_of_jobs[-1].job_id,list_of_jobs[-1].job_name, list_of_jobs[-1].resources)
     #Remove code above once application is ready
+
+
+
+
 
 def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craft, calendar_resource_dict):
     total_available_hours_within_period = 0
@@ -99,7 +108,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
             new_start_date, new_end_date = recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict)
             if new_end_date == None:
                 while True:
-                    user_input = input("Job can be scheduled on this date {}, do you want to schedule it? Y/N""\n""".format(new_start_date)).lower()
+                    user_input = input("Job can be scheduled on this date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date())).lower()
                     if user_input in ["y", "n"]:
                         break
                     else:
@@ -111,7 +120,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                         
             else:
                 while True:
-                    user_input = input("Job can be scheduled from this Start date {} to this End date {}, do you want to schedule it? Y/N""\n""".format(new_start_date, new_end_date))
+                    user_input = input("Job can be scheduled from Start date: {} --> End date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date(), new_end_date.date()))
                     if user_input in ["y", "n"]:
                         break
                     else:
@@ -122,7 +131,10 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                     return False, None, None  
         
         else:
-            return False, None, None               
+            return False, None, None        
+
+
+
         
 
 
@@ -136,8 +148,12 @@ def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_
                 if resources >= list(employee.values())[0]:
                     resources -= list(employee.values())[0]
                     recommended_date_range.append(current_date)
+                    if resources == 0:
+                        break
                 else:
                     resources -= resources
+                    recommended_date_range.append(current_date)
+                    break
             else:
                 continue
         current_date += dt.timedelta(days=1)
@@ -167,6 +183,9 @@ class job:
             raise IOError
         self.craft = craft
        
+             
+
+
              
         
    
@@ -273,6 +292,6 @@ class employee:
         for job in list_of_affected_jobs:
             print(job.job_id)
 
-    #still need to consider checking list of current jobs and alerting user of those that this employee affect
+    #still need to consider checking list of current jobs and alerting user of those that this leaving employee affect and reschedule those job
             
 
