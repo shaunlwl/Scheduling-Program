@@ -84,19 +84,67 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
             else:
                 print("ERROR: You have entered an invalid selection, Please try again""\n""")
         if user_input == "y":
-            return True
+            return True, start_date, due_date
                 
         else:
-            return None
+            return False, None, None
     else:
-        print("Job cannot be scheduled due to unavailable resources")
-        return False
+        while True:
+            user_input = input("Job cannot be scheduled due to unavailable resources, do you want to check for earliest available slot? Y/N""\n""").lower()
+            if user_input in ["y", "n"]:
+                break
+            else:
+                print("ERROR: You have entered an invalid selection, Please try again""\n""")
+        if user_input == "y":
+            new_start_date, new_end_date = recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict)
+            if new_end_date == None:
+                while True:
+                    user_input = input("Job can be scheduled on this date {}, do you want to schedule it? Y/N""\n""".format(new_start_date)).lower()
+                    if user_input in ["y", "n"]:
+                        break
+                    else:
+                        print("ERROR: You have entered an invalid selection, Please try again""\n""")
+                if user_input == "y":
+                    return True, new_start_date, new_start_date
+                else:
+                    return False, None, None                       
+                        
+            else:
+                while True:
+                    user_input = input("Job can be scheduled from this Start date {} to this End date {}, do you want to schedule it? Y/N""\n""".format(new_start_date, new_end_date))
+                    if user_input in ["y", "n"]:
+                        break
+                    else:
+                        print("ERROR: You have entered an invalid selection, Please try again""\n""")
+                if user_input == "y":
+                    return True, new_start_date, new_end_date
+                else:
+                    return False, None, None  
+        
+        else:
+            return False, None, None               
+        
 
 
-def recommendSchedule(resources, start_date, due_date, calendar_resource_dict):
+def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict):
+    
+    current_date = start_date
+    recommended_date_range = []
     while resources != 0:
-        for employee in calendar_resource_dict[start_date]:
-            pass
+        for employee in calendar_resource_dict[current_date]:
+            if list(employee.values())[1].lower() == craft.lower() and list(employee.values())[0] !=0:
+                if resources >= list(employee.values())[0]:
+                    resources -= list(employee.values())[0]
+                    recommended_date_range.append(current_date)
+                else:
+                    resources -= resources
+            else:
+                continue
+        current_date += dt.timedelta(days=1)
+    if len(recommended_date_range) == 1:
+        return recommended_date_range[0], None
+    else:
+        return recommended_date_range[0], recommended_date_range[-1]
         
     
 
