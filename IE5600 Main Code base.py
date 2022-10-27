@@ -2,8 +2,8 @@ import class_functions as cf
 import datetime as dt
 
 def main():    
-    calendar_start_date = "2022-01-01"
-    calendar_end_date = "2032-12-31"
+    calendar_start_date = "2022-12-31" # Application starts working from 31st Dec 2022 onwards only
+    calendar_end_date = "2042-12-31"
     list_of_employees = [] # This list shows current list of employees and includes any known employee that will join in the future but excludes any employee that has submitted a Last Day of Work
     list_of_jobs = []
     calendar_resource_dict = {} #This data structure will store the daily resource available by date as key
@@ -113,7 +113,7 @@ def main():
 
             else:
                 
-                if user_option_2 == "1":
+                if user_option_2 == "1": #Add Employee
                     employee_input_cleaned = False
                     while True:
                         employee_details = input("Please provide the following details, separated by commas: Employee ID, First Name, Last Name, Hourly Rate, Total Hours Per Day, Competency, Craft, Employee Start Date in yyyy-mm-dd""\n""").strip().split(",")
@@ -330,8 +330,84 @@ def main():
                             cf.scheduleJob(user_job_details[0],start_date, due_date,user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
                             job_id += 1
 
+
+
+
+
+
         elif user_option == "4": #Calculate Key Performance Indicators
-            print(list_of_jobs)
+            while True:
+                user_input = input("Please input a selection between 1 and 4:""\n"" 1 : Find all job details based on a specific Date or by Date Range ""\n"" 2 : Find job details based on Job ID ""\n"" 3 : Total Cost spent on Jobs for a specified Date Range ""\n"" 4 : Total Employee count by Craft for a specified Date (takes into account New Additions and Attritions) ""\n""")
+                if user_input not in ["1", "2", "3", "4"]:
+                    while True:
+                        user_input = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
+                        if user_input in ["y", "n"]:
+                            break
+                        else:
+                            continue
+
+                    if user_input == "y":
+                        continue
+                    else:
+                        break                                
+
+                               
+                else:
+                    if user_input == "1": #Find all job details based on a specific Date or by Date Range
+                        date_input = input("Please input date range in this format(note: For a single specific date, put both dates as the same): yyyy-mm-dd, yyyy-mm-dd""\n""").strip().split(",")
+                        if len(date_input) != 2:
+                            print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+                            break
+                        else:    
+                            for i in range(len(date_input)):
+                                date_input[i] = date_input[i].strip()
+                            try:
+                                start_date_option_4 = dt.datetime.strptime(date_input[0], '%Y-%m-%d')
+                                end_date_option_4 = dt.datetime.strptime(date_input[1], '%Y-%m-%d')
+                            except ValueError:
+                                print("ERROR: You have entered an invalid date format/type, Please ensure that it is in yyyy-mm-dd and try again""\n""")
+                            else:
+                                if start_date_option_4 == end_date_option_4:
+                                    pass #find any jobs that is happening on a specific date (use list of job employee attribute)
+                                else:
+                                    pass #find the jobs that applies to that date range
+
+
+
+                    if user_input == "2":  #Find job details based on Job ID
+                        job_exist = False
+                        id_input = input("Please input Job ID""\n""").strip()
+                        for jobs in list_of_jobs:
+                            if id_input == jobs.job_id:
+                                print("Job details are as follows: {} , {}, {}, {}, {} ".format(jobs.job_id, jobs.job_name, jobs.resources, jobs.total_cost, jobs.craft))
+                                print("These are the dates and employees and their hours working on the job:")
+                                print(jobs.employees)   
+                                job_exist = True 
+                                break
+                            else:
+                                continue                   
+                        if job_exist == False:
+                            print("Job ID does not exist in current database")
+
+                    if user_input == "3": #Total Cost spent on Jobs for a specified Date Range
+                        break
+
+
+                    if user_input == "4": #Total Employee count by Craft for a specified Date (takes into account New Additions and Attritions)
+                        break
+
+                    
+                    
+                    
+                    break
+
+
+
+
+
+
+
+
 
 
         while True: 

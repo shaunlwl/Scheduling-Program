@@ -108,7 +108,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
             new_start_date, new_end_date = recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict)
             if new_end_date == None:
                 while True:
-                    user_input = input("Job can be scheduled on this date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date())).lower()
+                    user_input = input("Job can be scheduled and fully completed on this date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date())).lower()
                     if user_input in ["y", "n"]:
                         break
                     else:
@@ -139,7 +139,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
 
 
 def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict):
-    
+    '''This function returns the best available schedule for the current job based on an assumption that the start date can be same or later (due to preparation of pre-work logistics etc.) but a flexible due date'''
     current_date = start_date
     recommended_date_range = []
     while resources != 0:
