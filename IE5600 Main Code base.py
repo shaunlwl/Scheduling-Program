@@ -71,7 +71,6 @@ def main():
                                     else:
                                         for items in employee_data: # this creates the employee objects and assumes that the .csv file has the same columns in the right order (refer to employee class __init__ ordering)
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
-
                                         cf.createCalendarRange(calendar_start_date, calendar_end_date, calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2032
                                         print(calendar_resource_dict)
                                         break
@@ -93,7 +92,7 @@ def main():
                                     else:                                        
                                         for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
                                             list_of_jobs.append(cf.job(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
-                                        
+
                                         break                                      
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical/Date type job attributes are in correct form ""\n""Pls try again""\n""")
@@ -381,8 +380,14 @@ def main():
                             except ValueError:
                                 print("ERROR: You have entered an invalid date format/type, Please ensure that it is in yyyy-mm-dd and try again""\n""")
                             else:
-                                if start_date_option_4 == end_date_option_4:
-                                    pass #find any jobs that is happening on a specific date (use list of job employee attribute)
+                                jobs_in_window = []
+                                if start_date_option_4 == end_date_option_4: #find any jobs that is happening on a specific date (use list of job employee attribute)
+                                    for job in list_of_jobs:
+                                        if dt.datetime.strptime(list_of_jobs[job][2], '%Y-%m-%d') == start_date_option_4:
+                                            jobs_in_window.append(list_of_jobs[job])
+                                        print("These jobs happen on {}: ".format(date_input[0]))
+                                        for job in jobs_in_window:
+                                            print("Employee ID: {} | First Name: {} | Last Name: {} | Hourly Rate: {} | Total Hours per day: {} | Competency: {} | Craft: {}".format(jobs_in_window[job][0], jobs_in_window[job][1], jobs_in_window[job][2], jobs_in_window[job][3], jobs_in_window[job][4], jobs_in_window[job][5], jobs_in_window[job][6]))
                                 else:
                                     pass #find the jobs that applies to that date range
 
