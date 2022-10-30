@@ -6,6 +6,7 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
     sd = dt.datetime.strptime(start_date, '%Y-%m-%d')
     ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
     delta = ed - sd
+    # Structure of the dictionary such that {date: [List of employees in dictionary{employee number: available hour, Craft: Craft},...,{}]}
     for i in range(delta.days+1):
         for employee in list_of_employees:
             if sd + dt.timedelta(days=i) not in calendar_resource_dict:
@@ -33,29 +34,30 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
                 resources = resources - list(employee.values())[0]
                 if start_date not in list(list_of_jobs[-1].employees.keys()): #if the start date is not a key in the job.employee attribute, save the start date as key
                     list_of_jobs[-1].employees[start_date] = [{list(employee.keys())[0]: list(employee.values())[0]}] #the job.employees attribute will look like this: {2022-01-02: [{emp_id: TotalHoursPerDay}]}
+                    # list_of_jobs[-1] will be the job of interest, which is the latest addition
                 else:
-                    list_of_jobs[-1].employees[start_date].append({list(employee.keys())[0]: list(employee.values())[0]})
+                    list_of_jobs[-1].employees[start_date].append({list(employee.keys())[0]: list(employee.values())[0]}) #deduct the available time to be 0 in the calendar dictionary
                 
                 employee[list(employee.keys())[0]]= 0
 
                 if resources == 0:
                     break
                 
-
+                # resource required is less than the free hours.
             elif list(employee.values())[0] != 0 and resources < list(employee.values())[0] and list(employee.values())[1].lower() == craft.lower():
-                employee[list(employee.keys())[0]]= list(employee.values())[0] - resources
+                employee[list(employee.keys())[0]]= list(employee.values())[0] - resources  # minus required resource from the available free hour for the employee
                 if start_date not in list(list_of_jobs[-1].employees.keys()):
                     list_of_jobs[-1].employees[start_date] = [{list(employee.keys())[0]: resources}]
                 else:
                     list_of_jobs[-1].employees[start_date].append({list(employee.keys())[0]: resources})
                 
-                resources = resources- resources
+                resources = resources- resources #resources = 0
                 
                 if resources == 0:
                     break
             
             else:
-                continue
+                continue # go to the next day
         start_date += dt.timedelta(days=1)
     
     print("SUCCESS! Job {} has been scheduled with the following details - \nID: {} \nStart date: {}".format(job_name, job_id, job_start_date.date()))
@@ -78,9 +80,9 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
 
         
     while current_date < due_date + dt.timedelta(days=1):
-        for employee in calendar_resource_dict[current_date]:
-            if list(employee.values())[1].lower() == craft.lower():
-                total_available_hours_within_period += list(employee.values())[0]
+        for employee in calendar_resource_dict[current_date]: # get all employees
+            if list(employee.values())[1].lower() == craft.lower(): # check if same craft
+                total_available_hours_within_period += list(employee.values())[0] # add up all available resources
             else:
                 continue
         current_date += dt.timedelta(days=1)
