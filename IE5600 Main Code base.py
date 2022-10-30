@@ -5,11 +5,25 @@ def main():
     calendar_start_date = "2022-12-31" # Application starts working from 31st Dec 2022 onwards only
     calendar_end_date = "2042-12-31"
     list_of_employees = [] # This list shows current list of employees and includes any known employee that will join in the future but excludes any employee that has submitted a Last Day of Work
-    list_of_jobs = []
+                           # list_of_employees[0] = Employee ID
+                           # list_of_employees[1] = First Name
+                           # list_of_employees[2] = Last Name
+                           # list_of_employees[3] = Hourly Rate
+                           # list_of_employees[4] = Total Hours per day
+                           # list_of_employees[5] = Competency
+                           # list_of_employees[6] = Craft
+    list_of_jobs = [] # list_of_jobs[0] = Job ID
+                      # list_of_jobs[1] = Job Name
+                      # list_of_jobs[2] = Start Date
+                      # list_of_jobs[3] = Completion by Date
+                      # list_of_jobs[4] = Resources required
+                      # list_of_jobs[5] = Total Cost
+                      # list_of_jobs[6] = Craft
     calendar_resource_dict = {} #This data structure will store the daily resource available by date as key
     job_id = 1000 #initialises first job id to 1000
     
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
+        print("Resource Management and Job Scheduling Tool for 2022-12-31 to 2042-12-31 Tasks")
         user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) ""\n""")
         try:
             if user_option not in ["1", "2", "3", "4"]:
@@ -43,7 +57,7 @@ def main():
                     if user_option_1 not in ["1", "2"]:
                         raise ValueError
                     else:
-                        if user_option_1 == "1": 
+                        if user_option_1 == "1": # Upload Employee Database
                             try:
                                 with open("employee.csv", "r", encoding="utf-8") as file:
                                     employee_attritbutes = []
@@ -65,7 +79,7 @@ def main():
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical employee attributes are in correct form ""\n""Pls try again""\n""")
                                 continue   
 
-                        elif user_option_1 == "2": 
+                        elif user_option_1 == "2": # Upload Job Database
                             try:
                                 with open("job.csv", "r", encoding="utf-8") as file:
                                     job_attributes = []
@@ -305,7 +319,7 @@ def main():
 
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required (in hours), Total cost, Craft Required""\n""").strip().split(",")
+            user_job_details = input("Please input: \n1 : Job Name, \n2: Start Date in yyyy-mm-dd, \n3 : Due Date in yyyy-mm-dd, \n4 : Resources Required (in hours), \n5 : Total cost, \n6 : Craft Required \ne.g. Repair, 2023-09-28, 2023-10-21, 4.0, 500, Instrument/Electrical \nInput : ""\n""").strip().split(",")
             if len(user_job_details) != 6:
                 print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
             else:
@@ -354,11 +368,11 @@ def main():
                                
                 else:
                     if user_input == "1": #Find all job details based on a specific Date or by Date Range
-                        date_input = input("Please input date range in this format(note: For a single specific date, put both dates as the same): yyyy-mm-dd, yyyy-mm-dd""\n""").strip().split(",")
+                        date_input = input("Please input start date followed by end date, in this format: yyyy-mm-dd, yyyy-mm-dd \n(Note: For a single specific date, put the same date for both inputs)""\n""").strip().split(",")
                         if len(date_input) != 2:
-                            print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+                            print("ERROR: You did not input two dates, Please try again""\n""")
                             break
-                        else:    
+                        elif len(date_input) == 2:
                             for i in range(len(date_input)):
                                 date_input[i] = date_input[i].strip()
                             try:
