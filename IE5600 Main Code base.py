@@ -14,7 +14,7 @@ def main():
         
         user_option = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
         try:
-            if user_option not in ["1", "2", "3", "4"]:
+            if user_option not in ["1", "2", "3", "4", "5"]:
                 raise ValueError
             else:
                 pass
@@ -404,11 +404,77 @@ def main():
                     break
 
 
+        elif user_option == "5": #Tracking of resources
+            while True:
+                user_input = input("Please input a selection between 1 and 2:\n 1 : Resource competency overview \n 2 : Resource occupiedness overview \n Input 1 or 2:")
+                if user_input not in ["1", "2"]:
+                    while True: # handles input error
+                        user_input = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
+                        if user_input in ["y", "n"]:
+                            break
+                        else:
+                            continue
 
-
-
-
-
+                    if user_input == "y":
+                        continue
+                    else:
+                        break                                
+                               
+                else:
+                    if user_input == "1": #Resource competency overview
+                        pass
+                    
+                    else: # user_input == "2" : resource utilization overview
+                        try:
+                            start_report, end_report = input("Please input start month and end month, in the format of yyyy-mm, separated by comma\n >>").replace(" ", "").split(",")
+                        
+                            #input data validation
+                        
+                            start_report = dt.datetime.strptime(start_report+"-01",'%Y-%m-%d')
+                            end_report = cf.nextMonth(dt.datetime.strptime(end_report+"-01",'%Y-%m-%d')) - dt.timedelta(days=1)
+                            
+                            if (start_report > end_report or
+                                start_report < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d') or
+                                end_report > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')):
+                                raise cf.invalidDate()
+                            
+                        except ValueError:
+                            print("ERROR: You have entered an invalid date format, please try again\n")
+                            break
+                        
+                        except cf.invalidDate:
+                            print("ERROR: The entered date is out of range or start month is later than end month, please try again\n")
+                            break
+                        
+                        print("\t \t \t Metals \t Machinery \t Instrument/Electrical")
+                        key = start_report
+                        resource_utilization = {key:{"Metals":[0,0],"Machinery":[0,0],"Instrument/Electrical":[0,0]}}
+                        while key < end_report:
+                            key = cf.nextMonth(key) # next month
+                            resource_utilization[key]={"Metals":[0,0],"Machinery":[0,0],"Instrument/Electrical":[0,0]}
+                        
+                        
+                        #dig for data in the calendar dictionary
+                        key = start_report
+                        while key <= end_report:                                            
+                            for employee in calendar_resource_dict[key]:
+                                resource_pair = [list(employee.values())[0],8]
+                                craft = employee['Craft']
+                                resource_utilization[key.replace(day=1)][craft][0] += resource_pair[0]
+                                resource_utilization[key.replace(day=1)][craft][1] += resource_pair[1]
+                            key = key + dt.timedelta(days=1)
+                        
+                        #print output
+                        key = start_report
+                        while key <= end_report:
+                            data = resource_utilization[key]
+                            metal_occupy = 1 - data['Metals'][0]/(data['Metals'][1]+0.001)
+                            machinary_occupy = 1 - data['Machinery'][0]/(data['Machinery'][1]+0.001)
+                            IE_occupy = 1 - data['Instrument/Electrical'][0]/(data['Instrument/Electrical'][1]+0.001)
+                            print("{} \t {:2.2%} \t {:2.2%} \t\t {:2.2%}".format(key.strftime('%Y-%b'), metal_occupy, machinary_occupy, IE_occupy))
+                            key = cf.nextMonth(key)
+                break
+        
 
 
 

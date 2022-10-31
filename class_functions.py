@@ -295,5 +295,12 @@ class employee:
             print(job.job_id)
 
     #still need to consider checking list of current jobs and alerting user of those that this leaving employee affect and reschedule those job
-            
 
+class invalidDate(Exception):
+    pass
+
+def nextMonth(date):
+    if date.month == 12:
+        return date.replace(month=1, year = date.year+1)
+    else:
+        return date.replace(month=date.month+1)
