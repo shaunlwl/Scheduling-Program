@@ -75,13 +75,25 @@ def main():
                                     for line in file:
                                         job_data.append(line.strip().split(","))
                                     job_attributes = job_data.pop(0)
-                                    if len(job_attributes) != 7:
-                                        print("ERROR: Data from .csv file does not match expected input of seven job attributes, please try again""\n""")
+                                    print(job_attributes)
+                                    
+                                    if len(job_attributes) != 6:
+                                        print("ERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
                                         continue
                                     else:                                        
-                                        for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
-                                            list_of_jobs.append(cf.job(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
+                                        if calendar_resource_dict == {}:
+                                            print("Please initialise resource calendar as a first step before adding scheduled jobs by adding employee database")
+                                            continue
                                         
+                                        for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
+                                            items[1] = dt.datetime.strptime(items[1], '%-d/%-m/%Y')
+                                            items[2] = dt.datetime.strptime(items[2], '%-d/%-m/%Y')
+                                            if items[1] < calendar_start_date:
+                                                print("Scheduled job starts before Job Scheduling Tool start date of {}, please try again".format(calendar_start_date))
+                                                break
+                                            cf.scheduleJob(items[0], items[1], items[2],items[3], items[4], items[5], calendar_resource_dict, job_id, list_of_jobs)
+                                            job_id += 1
+
                                         break                                      
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical/Date type job attributes are in correct form ""\n""Pls try again""\n""")

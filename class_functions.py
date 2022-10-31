@@ -57,7 +57,7 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
                     break
             
             else:
-                continue # go to the next day
+                continue # go to the next employee
         start_date += dt.timedelta(days=1)
     
     print("SUCCESS! Job {} has been scheduled with ID {} and Start date: {}".format(job_name, job_id, job_start_date.date()))
