@@ -10,8 +10,8 @@ def main():
     job_id = 1000 #initialises first job id to 1000
     
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
-        print("RESOURCE MANAGEMENT AND JOB SCHEDULING TOOL **BETWEEN 2022-12-31 AND 2042-12-31**")
-        user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
+        print("\nRESOURCE MANAGEMENT AND JOB SCHEDULING TOOL ** BETWEEN {} AND {} **".format(calendar_start_date, calendar_end_date))
+        user_option = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
         try:
             if user_option not in ["1", "2", "3", "4"]:
                 raise ValueError
