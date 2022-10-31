@@ -11,7 +11,7 @@ def main():
     
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
         print("RESOURCE MANAGEMENT AND JOB SCHEDULING TOOL **BETWEEN 2022-12-31 AND 2042-12-31**")
-        user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) ""\n""")
+        user_option = input("Please input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
         try:
             if user_option not in ["1", "2", "3", "4"]:
                 raise ValueError
@@ -39,7 +39,7 @@ def main():
 
         if user_option == "1": #Upload Employee/Job Database from .csv file format only (Note: Option 1 must always be run first to initialise the Resource Calendar)
             while True:
-                user_option_1 = input("Do you want to upload 1: Employee database or 2: Job database? Please input 1 or 2 ""\n""")
+                user_option_1 = input("Which database do you want to upload - \n1 : Employee database \n2 : Job database \nInput (1) or (2): ")
                 try:
                     if user_option_1 not in ["1", "2"]:
                         raise ValueError
@@ -107,7 +107,7 @@ def main():
 
 
         elif user_option == "2": #Add/Remove Employee(s)/Update Job/Task
-            user_option_2 = input("Do you want to:""\n""1 : Add an Employee to Database ""\n""2 : Remove an Employee from Database ""\n""3 : Update existing Job details""\n""")
+            user_option_2 = input("Do you want to:""\n""1 : Add an employee to database ""\n""2 : Remove an employee from database ""\n""3 : Update existing job details \nInput (1), (2) or (3): ")
             if user_option_2 not in ["1", "2", "3"]:
                 print("ERROR: You have entered an invalid selection, Please try again")
                 continue
@@ -117,7 +117,7 @@ def main():
                 if user_option_2 == "1": #Add Employee
                     employee_input_cleaned = False
                     while True:
-                        employee_details = input("Please provide the following details, separated by commas: Employee ID, First Name, Last Name, Hourly Rate, Total Hours Per Day, Competency, Craft, Employee Start Date in yyyy-mm-dd""\n""").strip().split(",")
+                        employee_details = input("Please provide the following details (separated by commas) - \nEmployee ID, \nFirst Name, \nLast Name, \nHourly Rate, \nTotal Hours Per Day, \nCompetency, \nCraft, \nEmployee Start Date (yyyy-mm-dd) \nInput: ").strip().split(",")
                         if len(employee_details) != 8:
                             print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                             user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
@@ -197,7 +197,7 @@ def main():
 
                 elif user_option_2 == "2": # Remove Employee
                     while True:
-                        employee_details = input("Please key in Employee ID and Last Day of Work (yyyy-mm-dd) with commas separating each input""\n""").strip().split(",")
+                        employee_details = input("Please key in the following (separated by commas) - \nEmployee ID \nLast Day of Work (yyyy-mm-dd) \nInput: ").strip().split(",")
                         if len(employee_details) != 2:
                             print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                             user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
@@ -306,7 +306,7 @@ def main():
 
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("Please input Job Name, Start Date in yyyy-mm-dd, Due Date in yyyy-mm-dd, Resources Required (in hours), Total cost, Craft Required""\n""").strip().split(",")
+            user_job_details = input("Please input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (in hours), \nTotal cost, \nCraft Required \nInput: ").strip().split(",")
             if len(user_job_details) != 6:
                 print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
             else:
@@ -338,7 +338,7 @@ def main():
 
         elif user_option == "4": #Calculate Key Performance Indicators
             while True:
-                user_input = input("Please input a selection between 1 and 4:""\n"" 1 : Find all job details based on a specific Date or by Date Range ""\n"" 2 : Find job details based on Job ID ""\n"" 3 : Total Cost spent on Jobs for a specified Date Range ""\n"" 4 : Total Employee count by Craft for a specified Date (takes into account New Additions and Attritions) ""\n""")
+                user_input = input("Please input a selection between 1 and 4:""\n"" 1 : Find all job details based on a specific Date or by Date Range ""\n"" 2 : Find job details based on Job ID ""\n"" 3 : Total Cost spent on Jobs for a specified Date Range ""\n"" 4 : Total Employee count by Craft for a specified Date (takes into account New Additions and Attritions) \nInput (1), (2), (3) or (4): ")
                 if user_input not in ["1", "2", "3", "4"]:
                     while True:
                         user_input = input("ERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
@@ -355,7 +355,7 @@ def main():
                                
                 else:
                     if user_input == "1": #Find all job details based on a specific Date or by Date Range
-                        date_input = input("Please input date range in this format(note: For a single specific date, put both dates as the same): yyyy-mm-dd, yyyy-mm-dd""\n""").strip().split(",")
+                        date_input = input("Please input start date followed by end date in this format: yyyy-mm-dd, yyyy-mm-dd \n(note: For a single specific date, put both dates as the same) \nInput: ").strip().split(",")
                         if len(date_input) != 2:
                             print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                             break
