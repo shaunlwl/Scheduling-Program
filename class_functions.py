@@ -1,4 +1,4 @@
-import datetime as dt
+import datetime as dt # Hi Benson testing
 
 
 def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_employees):
@@ -242,7 +242,7 @@ class employee:
 
     def setCompetency(self,competency):
         self._competency = competency
-        
+
     def getCraft(self):
         return self._craft
 
