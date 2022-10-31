@@ -5,11 +5,15 @@ def main():
     calendar_start_date = "2022-12-31" # Application starts working from 31st Dec 2022 onwards only
     calendar_end_date = "2042-12-31"
     list_of_employees = [] # This list shows current list of employees and includes any known employee that will join in the future but excludes any employee that has submitted a Last Day of Work
+    list_of_new_employees = []
+    list_of_leaving_employees = []
     list_of_jobs = []
     calendar_resource_dict = {} #This data structure will store the daily resource available by date as key
     job_id = 1000 #initialises first job id to 1000
-    
+    job_database_initialised_count = 0 #To prevent job database from initialising twice
+
     print("\nRESOURCE MANAGEMENT AND JOB SCHEDULING TOOL ** BETWEEN {} AND {} **".format(calendar_start_date, calendar_end_date))
+
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
         
         user_option = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
@@ -68,36 +72,49 @@ def main():
                                 continue   
 
                         elif user_option_1 == "2": 
-                            try:
-                                with open("job.csv", "r", encoding="utf-8") as file:
-                                    job_attributes = []
-                                    job_data = []
-                                    for line in file:
-                                        job_data.append(line.strip().split(","))
-                                    job_attributes = job_data.pop(0)
-                                    print(job_attributes)
-                                    
-                                    if len(job_attributes) != 6:
-                                        print("ERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
-                                        continue
-                                    else:                                        
-                                        if calendar_resource_dict == {}:
-                                            print("Please initialise resource calendar as a first step before adding scheduled jobs by adding employee database")
-                                            continue
+                            
+                            if job_database_initialised_count == 0:
+                                try:
+                                    with open("job.csv", "r", encoding="utf-8") as file:
+                                        job_attributes = []
+                                        job_data = []
+                                        for line in file:
+                                            job_data.append(line.strip().split(","))
+                                        job_attributes = job_data.pop(0)
                                         
-                                        for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
-                                            items[1] = dt.datetime.strptime(items[1], '%-d/%-m/%Y')
-                                            items[2] = dt.datetime.strptime(items[2], '%-d/%-m/%Y')
-                                            if items[1] < calendar_start_date:
-                                                print("Scheduled job starts before Job Scheduling Tool start date of {}, please try again".format(calendar_start_date))
-                                                break
-                                            cf.scheduleJob(items[0], items[1], items[2],items[3], items[4], items[5], calendar_resource_dict, job_id, list_of_jobs)
-                                            job_id += 1
+                                        print(job_data)
+                                        
+                                        if len(job_attributes) != 6:
+                                            print("ERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
+                                            continue
+                                        else:                                        
+                                            if calendar_resource_dict == {}:
+                                                print("ERROR: Please initialise Resource Calendar as a first step before adding scheduled jobs by adding employee database""\n""")
+                                                continue
+                                            
+                                            for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
+                                                
+                                                items[1] = dt.datetime.strptime(items[1], '%d/%m/%Y')
+                                                items[2] = dt.datetime.strptime(items[2], '%d/%m/%Y')
+                                                items[3] = float(items[3])
+                                                items[4] = float(items[4])
+                                                if items[1] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d'):
+                                                    print("Scheduled job starts before Job Scheduling Tool start date of {}, please try again""\n""".format(calendar_start_date))
+                                                    break
+                                                cf.scheduleJob(items[0], items[1], items[2],items[3], items[4], items[5], calendar_resource_dict, job_id, list_of_jobs)
+                                                job_id += 1
+                                            job_database_initialised_count = 1 #So that the job database will not be initialised twice   
+                                            
+                                            break                                      
 
-                                        break                                      
-                            except IOError:
-                                print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical/Date type job attributes are in correct form ""\n""Pls try again""\n""")
-                                continue                                
+
+                                except IOError:
+                                    print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical/Date type job attributes are in correct form ""\n""Pls try again""\n""")
+                                    continue                                
+
+                            else:
+                                print("ERROR: You have already initialsied the Job Database""\n""") 
+                                break
 
                 except ValueError:
                     while True:
@@ -267,14 +284,15 @@ def main():
                                         break   
                                 else:
                                     employee_exist_in_database = False
-                                    count = 0
+                                    
                                     for employee in list_of_employees:
                                         if employee_details[0] == employee.getEmpId():
                                             employee_exist_in_database = True
-                                            index= count
+                                            removed_employee_craft = employee.getCraft()
+                                            
                                             break
                                         else:
-                                            count +=1
+                                            
                                             continue
                                     if employee_exist_in_database == True and employee_end_before_calendar_end == True:
                                         confirm_deletion = input("Do you confirm removal of employee from database with Employee ID: " + str(employee_details[0]) + "? Y/N""\n""").lower()
@@ -285,11 +303,12 @@ def main():
                                                 confirm_deletion = input("ERROR: You have entered an invalid selection, Do you confirm removal of employee from database? Y/N""\n""").lower()
                                                 continue
                                         if confirm_deletion == "y":
-                                            cf.employee.removeEmployee(employee_details[0],employee_details[1], index, list_of_employees, calendar_resource_dict, calendar_end_date, list_of_jobs)
+                                            cf.employee.removeEmployee(employee_details[0],employee_details[1], removed_employee_craft, list_of_leaving_employees, calendar_resource_dict, calendar_end_date, list_of_jobs)
                                             break
 
                                             
                                         else:
+                                            print("Deletion not confirmed, no action taken by system")
                                             break
 
 

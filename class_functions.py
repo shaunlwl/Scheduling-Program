@@ -3,17 +3,19 @@ import datetime as dt
 
 def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_employees):
     '''This function initialises the date range (using a dictionary) for which our scheduling application works'''
-    sd = dt.datetime.strptime(start_date, '%Y-%m-%d')
-    ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
-    delta = ed - sd
-    # Structure of the dictionary such that {date: [List of employees in dictionary{employee number: available hour, Craft: Craft},...,{}]}
-    for i in range(delta.days+1):
-        for employee in list_of_employees:
-            if sd + dt.timedelta(days=i) not in calendar_resource_dict:
-                calendar_resource_dict[sd + dt.timedelta(days=i)] = [{employee.getEmpId(): employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()}]
-            else:
-                calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId():employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()})
-
+    if calendar_resource_dict == {}: #Safeguard to ensure that Calendar is not initialised twice
+        sd = dt.datetime.strptime(start_date, '%Y-%m-%d')
+        ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
+        delta = ed - sd
+        # Structure of the dictionary such that {date: [List of employees in dictionary{employee number: available hour, Craft: Craft},...,{}]}
+        for i in range(delta.days+1):
+            for employee in list_of_employees:
+                if sd + dt.timedelta(days=i) not in calendar_resource_dict:
+                    calendar_resource_dict[sd + dt.timedelta(days=i)] = [{employee.getEmpId(): employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()}]
+                else:
+                    calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId():employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()})
+    else:
+        print("ERROR: You have already initialised the Resource Calendar""\n""")
 
 
 
@@ -41,6 +43,7 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
                 employee[list(employee.keys())[0]]= 0
 
                 if resources == 0:
+                    list_of_jobs[-1].scheduled_end_date = start_date
                     break
                 
                 # resource required is less than the free hours.
@@ -54,6 +57,7 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
                 resources = resources- resources #resources = 0
                 
                 if resources == 0:
+                    list_of_jobs[-1].scheduled_end_date = start_date
                     break
             
             else:
@@ -64,11 +68,6 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
     print("Here are the allocated employee IDs and their allocated work hours for this job: \n(i.e. Date: yyyy-mm-dd --> [{Employee ID: Work Hour(s)}])")
     for dates in list_of_jobs[-1].employees:
         print("      Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
-
-    #Check that job has been scheduled properly)
-    print("Job ID: {} \nJob Name: {} \nManhours: {} hours".format(list_of_jobs[-1].job_id,list_of_jobs[-1].job_name, list_of_jobs[-1].resources))
-    #Remove code above once application is ready
-
 
 
 
@@ -184,7 +183,7 @@ class job:
             print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
             raise IOError
         self.craft = craft
-       
+        self.scheduled_end_date = None #This is the scheduled end date in the system (maybe same or different from the planned due date input by user)  
              
 
 
@@ -271,17 +270,21 @@ class employee:
                 calendar_resource_dict[sd + dt.timedelta(days=i)].append({list_of_employees[-1].getEmpId():list_of_employees[-1].getTotalHoursPerDay(), "Craft" : list_of_employees[-1].getCraft().capitalize()})
     
     @staticmethod
-    def removeEmployee(emp_id, last_day ,index, list_of_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
-        del list_of_employees[index] # Remove employee from list of employees (although it is not Last Day of Work yet)
+    def removeEmployee(emp_id, last_day ,craft, list_of_leaving_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
+        
+        list_of_leaving_employees.append({last_day: emp_id}) #Add to list of leaving employees so that when current employee list is pulled, there will be a check with the list_of_leaving_employees first
         sd = last_day + dt.timedelta(days=1) #Employee is still considered working on Last Day of Work
         ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')  
         delta = ed - sd
         for i in range(delta.days +1): 
             for employees in calendar_resource_dict[sd + dt.timedelta(days=i)]:
                 if list(employees.keys())[0] == emp_id:
-                    calendar_resource_dict[sd + dt.timedelta(days=i)].remove(employees) # Removes this particular employee resource from all dates starting from Last Day of Work
+                    calendar_resource_dict[sd + dt.timedelta(days=i)].remove(employees) # Removes this particular employee resource from all dates in Calendar Resource starting from Last Day of Work
 
      #havent tested this portion of code below yet!!!   
+     
+        affected_resources = 0
+        list_of_affected_jobs_id = []
         list_of_affected_jobs = []
         for job in list_of_jobs:
             for dates in list(job.employees.keys()):
@@ -291,9 +294,63 @@ class employee:
                     for employee in job.employees[dates]:
                         if list(employee.keys())[0] == emp_id:
                             list_of_affected_jobs.append(job)
-        for job in list_of_affected_jobs:
-            print(job.job_id)
+                            list_of_affected_jobs_id.append(job.job_id)
+                            affected_resources = employee.values()
+                            for employees in calendar_resource_dict[dates]:
+                                if list(employees.values())[0] == 0:
+                                    continue
 
-    #still need to consider checking list of current jobs and alerting user of those that this leaving employee affect and reschedule those job
+                                elif list(employees.values())[0] != 0 and affected_resources >= list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower(): #[0] is the index for the employee attribute of TotalHoursPerDay and [1] is the index for employee attribute Craft
+                                    affected_resources = affected_resources - list(employees.values())[0]
+
+                                    if dates not in job.employees.keys(): 
+                                        job.employees[dates] = [{list(employees.keys())[0]: list(employees.values())[0]}] #the job.employees attribute will look like this: {2022-01-02: [{emp_id: TotalHoursPerDay}]}
+                    
+                                    else:
+                                        job.employees[dates].append({list(employees.keys())[0]: list(employees.values())[0]}) #deduct the available time to be 0 in the calendar dictionary
+                
+                                    employees[list(employees.keys())[0]]= 0
+
+                                    if affected_resources == 0:
+                                        if dates > job.scheduled_end_date:
+                                            
+                                            job.scheduled_end_date = dates
+                                        else:
+                                            pass
+                                        break
+                
+                
+                                elif list(employees.values())[0] != 0 and affected_resources < list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower():
+                                    employees[list(employees.keys())[0]]= list(employees.values())[0] - affected_resources  # minus required resource from the available free hour for the employee
+                                    if dates not in list(job.employees.keys()):
+                                        job.employees[dates] = [{list(employees.keys())[0]: affected_resources}]
+                                    else:
+                                        job.employees[dates].append({list(employees.keys())[0]: affected_resources})
+                
+                                    affected_resources = affected_resources- affected_resources #affected_resources = 0
+
+
+                                    if affected_resources == 0:
+                                        if dates > job.scheduled_end_date:
+                                            
+                                            job.scheduled_end_date = dates
+                                        else:
+                                            pass
+                                        break
+            
+                                else:
+                                    continue 
+
+        set_of_affected_jobs = set(list_of_affected_jobs)
+        set_of_affected_jobs_id = set(list_of_affected_jobs_id)
+        print("These jobs (by Job ID) are affected by employee leaving on {} :""\n""{}".format(last_day + dt.timedelta(days=1), set_of_affected_jobs_id))
+        for jobs in set_of_affected_jobs:
+            print("Planned due date {} --- New Scheduled End Date {}".format(jobs.due_date, jobs.scheduled_end_date))
+
+        ### Not Tested YET!!!!!
+
+
+
+    
             
 
