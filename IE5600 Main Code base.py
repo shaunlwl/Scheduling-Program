@@ -471,7 +471,7 @@ def main():
                             metal_occupy = 1 - data['Metals'][0]/(data['Metals'][1]+0.001)
                             machinary_occupy = 1 - data['Machinery'][0]/(data['Machinery'][1]+0.001)
                             IE_occupy = 1 - data['Instrument/Electrical'][0]/(data['Instrument/Electrical'][1]+0.001)
-                            print("{} \t {:2.2%} \t {:2.2%} \t\t {:2.2%}".format(key.strftime('%Y-%b'), metal_occupy, machinary_occupy, IE_occupy))
+                            print("{} \t {:2.2%} \t\t {:2.2%} \t\t {:2.2%}".format(key.strftime('%Y-%b'), metal_occupy, machinary_occupy, IE_occupy))
                             key = cf.nextMonth(key)
                 break
         
