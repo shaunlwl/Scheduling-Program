@@ -122,7 +122,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                         
             else:
                 while True:
-                    user_input = input("Job can be scheduled from Start date: {} --> End date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date(), new_end_date.date()))
+                    user_input = input("Job can be scheduled from Start date: {} --> End date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date(), new_end_date.date())).lower()
                     if user_input in ["y", "n"]:
                         break
                     else:
