@@ -8,10 +8,10 @@ def main():
                            # list_of_employees[index].getEmpId() = Employee ID
                            # list_of_employees[index].getFirstName() = First Name
                            # list_of_employees[index].getLastName() = Last Name
-                           # list_of_employees[3] = Hourly Rate
-                           # list_of_employees[4] = Total Hours per day
-                           # list_of_employees[5] = Competency
-                           # list_of_employees[6] = Craft
+                           # list_of_employees[index].getHourlyrate() = Hourly Rate
+                           # list_of_employees[index].getTotalHoursPerDay() = Total Hours per day
+                           # list_of_employees[index].getCompetency() = Competency
+                           # list_of_employees[index].getCraft() = Craft
     list_of_jobs = [] # list_of_jobs[0] = Job ID
                       # list_of_jobs[1] = Job Name
                       # list_of_jobs[2] = Start Date
