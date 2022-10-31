@@ -118,7 +118,7 @@ def main():
                 if user_option_2 == "1": #Add Employee
                     employee_input_cleaned = False
                     while True:
-                        employee_details = input("Please provide the following details (separated by commas) - \nEmployee ID, \nFirst Name, \nLast Name, \nHourly Rate, \nTotal Hours Per Day, \nCompetency, \nCraft, \nEmployee Start Date (yyyy-mm-dd) \nInput: ").strip().split(",")
+                        employee_details = input("Please provide the following details (separated by commas) - \nEmployee ID, \nFirst Name, \nLast Name, \nHourly Rate, \nTotal Hours Per Day, \nCompetency (numerical rating out of 5), \nCraft (Metals, Machinery or Instrument/Electrical), \nEmployee Start Date (yyyy-mm-dd) \nInput: ").strip().split(",")
                         if len(employee_details) != 8:
                             print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                             user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
