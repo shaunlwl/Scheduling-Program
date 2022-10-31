@@ -61,12 +61,12 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
         start_date += dt.timedelta(days=1)
     
     print("SUCCESS! Job {} has been scheduled with ID {} and Start date: {}".format(job_name, job_id, job_start_date.date()))
-    print("Here are the employee(s) (by ID) and Work Hours allocated to the Job (i.e {Emp Id : Work hours allocated}):")
+    print("Here are the allocated employee IDs and their allocated work hours for this job: \n(i.e. Date: yyyy-mm-dd --> [{Employee ID: Work Hour(s)}])")
     for dates in list_of_jobs[-1].employees:
-        print("Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
+        print("      Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
 
     #Check that job has been scheduled properly)
-    print(list_of_jobs[-1].job_id,list_of_jobs[-1].job_name, list_of_jobs[-1].resources)
+    print("Job ID: {} \nJob Name: {} \nManhours: {} hours".format(list_of_jobs[-1].job_id,list_of_jobs[-1].job_name, list_of_jobs[-1].resources))
     #Remove code above once application is ready
 
 
