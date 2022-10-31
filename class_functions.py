@@ -239,12 +239,12 @@ class employee:
 
     def getCompetency(self):
         return self._competency
-    
-    def getCraft(self):
-        return self._craft
 
     def setCompetency(self,competency):
         self._competency = competency
+        
+    def getCraft(self):
+        return self._craft
 
     @staticmethod
     def ComputeAvgCompetency(list_of_employees):

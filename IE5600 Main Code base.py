@@ -5,9 +5,9 @@ def main():
     calendar_start_date = "2022-12-31" # Application starts working from 31st Dec 2022 onwards only
     calendar_end_date = "2042-12-31"
     list_of_employees = [] # This list shows current list of employees and includes any known employee that will join in the future but excludes any employee that has submitted a Last Day of Work
-                           # list_of_employees[0] = Employee ID
-                           # list_of_employees[1] = First Name
-                           # list_of_employees[2] = Last Name
+                           # list_of_employees[index].getEmpId() = Employee ID
+                           # list_of_employees[index].getFirstName() = First Name
+                           # list_of_employees[index].getLastName() = Last Name
                            # list_of_employees[3] = Hourly Rate
                            # list_of_employees[4] = Total Hours per day
                            # list_of_employees[5] = Competency
