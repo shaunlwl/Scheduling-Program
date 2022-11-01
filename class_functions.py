@@ -166,7 +166,7 @@ def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_
     
 
 
-
+#Created as a Public Class
 class job:
     
     def __init__(self, job_id, job_name, start_date, due_date, resources, total_cost, craft):
@@ -178,7 +178,7 @@ class job:
             self.due_date = due_date
             self.resources = float(resources)
             self.total_cost = float(total_cost)
-            self.employees = {}
+            self.employees = {} #To create an association to employee class (for easy reference of employees tagged to a job)
         except ValueError:
             print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
             raise IOError
@@ -189,7 +189,7 @@ class job:
 
              
         
-   
+#Created as a Private Class  
 class employee:
     
     def __init__(self, emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft):
@@ -272,7 +272,7 @@ class employee:
     @staticmethod
     def removeEmployee(emp_id, last_day ,craft, list_of_leaving_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
         
-        list_of_leaving_employees.append({last_day: emp_id}) #Add to list of leaving employees so that when current employee list is pulled, there will be a check with the list_of_leaving_employees first
+        list_of_leaving_employees.append({last_day + dt.timedelta(days=1): emp_id}) #Add to list of leaving employees so that when current employee list is pulled, there will be a check with the list_of_leaving_employees first
         sd = last_day + dt.timedelta(days=1) #Employee is still considered working on Last Day of Work
         ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')  
         delta = ed - sd
@@ -280,66 +280,71 @@ class employee:
             for employees in calendar_resource_dict[sd + dt.timedelta(days=i)]:
                 if list(employees.keys())[0] == emp_id:
                     calendar_resource_dict[sd + dt.timedelta(days=i)].remove(employees) # Removes this particular employee resource from all dates in Calendar Resource starting from Last Day of Work
-
+        
      #havent tested this portion of code below yet!!!   
      
         affected_resources = 0
         list_of_affected_jobs_id = []
         list_of_affected_jobs = []
         for job in list_of_jobs:
-            for dates in list(job.employees.keys()):
+            for dates in list(job.employees.keys()): #Looping through the various dates that the job is scheduled to occur
                 if dates < sd:
                     continue
                 else:
-                    for employee in job.employees[dates]:
+                    for employee in job.employees[dates]: #Looping through the employees tagged to a job on a certain date
                         if list(employee.keys())[0] == emp_id:
                             list_of_affected_jobs.append(job)
                             list_of_affected_jobs_id.append(job.job_id)
-                            affected_resources = employee.values()
-                            for employees in calendar_resource_dict[dates]:
-                                if list(employees.values())[0] == 0:
-                                    continue
+                            affected_resources = list(employee.values())[0] #Store how many hours is affected for that day(dates)
+                            
+                            calendar_reschedule_date_loop = dates #Assign a looping variable to the dates (which signify the affected date)
 
-                                elif list(employees.values())[0] != 0 and affected_resources >= list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower(): #[0] is the index for the employee attribute of TotalHoursPerDay and [1] is the index for employee attribute Craft
-                                    affected_resources = affected_resources - list(employees.values())[0]
+                            while affected_resources != 0:
+                                for employees in calendar_resource_dict[calendar_reschedule_date_loop]:
+                                    if list(employees.values())[0] == 0:
+                                        continue
 
-                                    if dates not in job.employees.keys(): 
-                                        job.employees[dates] = [{list(employees.keys())[0]: list(employees.values())[0]}] #the job.employees attribute will look like this: {2022-01-02: [{emp_id: TotalHoursPerDay}]}
+                                    elif list(employees.values())[0] != 0 and affected_resources >= list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower(): #[0] is the index for the employee attribute of TotalHoursPerDay and [1] is the index for employee attribute Craft
+                                        affected_resources = affected_resources - list(employees.values())[0]
+
+                                        if dates not in job.employees.keys(): 
+                                            job.employees[dates] = [{list(employees.keys())[0]: list(employees.values())[0]}] #the job.employees attribute will look like this: {2022-01-02: [{emp_id: TotalHoursPerDay}]}
+                        
+                                        else:
+                                            job.employees[dates].append({list(employees.keys())[0]: list(employees.values())[0]}) #deduct the available time to be 0 in the calendar dictionary
                     
-                                    else:
-                                        job.employees[dates].append({list(employees.keys())[0]: list(employees.values())[0]}) #deduct the available time to be 0 in the calendar dictionary
-                
-                                    employees[list(employees.keys())[0]]= 0
+                                        employees[list(employees.keys())[0]]= 0
 
-                                    if affected_resources == 0:
-                                        if dates > job.scheduled_end_date:
-                                            
-                                            job.scheduled_end_date = dates
+                                        if affected_resources == 0:
+                                            if dates > job.scheduled_end_date:
+                                                
+                                                job.scheduled_end_date = dates
+                                            else:
+                                                pass
+                                            break
+                    
+                    
+                                    elif list(employees.values())[0] != 0 and affected_resources < list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower():
+                                        employees[list(employees.keys())[0]]= list(employees.values())[0] - affected_resources  # minus required resource from the available free hour for the employee
+                                        if dates not in list(job.employees.keys()):
+                                            job.employees[dates] = [{list(employees.keys())[0]: affected_resources}]
                                         else:
-                                            pass
-                                        break
+                                            job.employees[dates].append({list(employees.keys())[0]: affected_resources})
+                    
+                                        affected_resources = affected_resources- affected_resources #affected_resources = 0
+
+
+                                        if affected_resources == 0:
+                                            if dates > job.scheduled_end_date:
+                                                
+                                                job.scheduled_end_date = dates
+                                            else:
+                                                pass
+                                            break
                 
-                
-                                elif list(employees.values())[0] != 0 and affected_resources < list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower():
-                                    employees[list(employees.keys())[0]]= list(employees.values())[0] - affected_resources  # minus required resource from the available free hour for the employee
-                                    if dates not in list(job.employees.keys()):
-                                        job.employees[dates] = [{list(employees.keys())[0]: affected_resources}]
                                     else:
-                                        job.employees[dates].append({list(employees.keys())[0]: affected_resources})
-                
-                                    affected_resources = affected_resources- affected_resources #affected_resources = 0
-
-
-                                    if affected_resources == 0:
-                                        if dates > job.scheduled_end_date:
-                                            
-                                            job.scheduled_end_date = dates
-                                        else:
-                                            pass
-                                        break
-            
-                                else:
-                                    continue 
+                                        continue 
+                            calendar_reschedule_date_loop += dt.timedelta(days=1)
 
         set_of_affected_jobs = set(list_of_affected_jobs)
         set_of_affected_jobs_id = set(list_of_affected_jobs_id)

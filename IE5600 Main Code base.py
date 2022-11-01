@@ -140,7 +140,7 @@ def main():
             user_option_2 = input("Do you want to:""\n""1 : Add an employee to database ""\n""2 : Remove an employee from database ""\n""3 : Update existing job details \nInput (1), (2) or (3): ")
             if user_option_2 not in ["1", "2", "3"]:
                 print("ERROR: You have entered an invalid selection, Please try again")
-                continue
+                
 
             else:
                 
@@ -230,6 +230,7 @@ def main():
                         employee_details = input("Please key in the following (separated by commas) - \nEmployee ID \nLast Day of Work (yyyy-mm-dd) \nInput: ").strip().split(",")
                         if len(employee_details) != 2:
                             print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+                            
                             user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
                             while True:
                                 if user_option_reselect in ["y", "n"]:
@@ -255,6 +256,7 @@ def main():
                                     employee_end_before_calendar_end = False
                             except ValueError:
                                 print("ERROR: You have entered an invalid date format for Last Day of Work, Please try again""\n""")
+                                
                                 user_option_reselect= input("Do you want to re-input employee details? Y/N""\n""").lower()
                                 while True:
                                     if user_option_reselect in ["y", "n"]:
@@ -271,6 +273,7 @@ def main():
                                     employee_details[0] = int(employee_details[0])
                                 except ValueError:
                                     print("ERROR: Please check input for Employee ID, expected input are numerical digits, Please try again""\n""")
+                                    
                                     user_option_reselect= input("Do you want to re-input employee details? Y/N""\n""").lower()
                                     while True:
                                         if user_option_reselect in ["y", "n"]:
