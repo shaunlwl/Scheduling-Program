@@ -70,6 +70,7 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
     for dates in list_of_jobs[-1].employees:
         print("      Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
     print("\n")
+    
 
 
 
@@ -288,21 +289,36 @@ class employee:
         return total_competency/len(list_of_employees)
 
     @staticmethod
-    def CurrentEmployeeCount(list_of_employees):
-        return len(list_of_employees)      
+    def CurrentEmployeeCount(list_of_employees, list_of_new_employees, list_of_leaving_employees, current_date):
+        temp_list_of_employees = list_of_employees
+        for items in list_of_leaving_employees:
+            if current_date < list(items.keys())[0]:
+                continue
+            else:
+                for employees in temp_list_of_employees:
+                    if employees.getEmpId() == list(items.values())[0]:
+                        temp_list_of_employees.remove(employees)
+        
+        for items in list_of_new_employees:
+            if current_date >= list(items.keys())[0]:
+                temp_list_of_employees.append(list(items.values())[0])  
+            else:
+                continue
+    
+        return len(temp_list_of_employees)      
 
     @staticmethod      
-    def addEmployee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft, start_date, list_of_employees, calendar_resource_dict, calendar_end_date):
-        '''This method appends a new employee to the current employee list and adds this new employee to the resource tracked in the Calendar. This method should only be called when Calendar Resource Dict has been initialised with the crateCalendarRange function'''
-        list_of_employees.append(employee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft))
+    def addEmployee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft, start_date, list_of_new_employees, calendar_resource_dict, calendar_end_date):
+        '''This method appends a new employee to the current employee list and adds this new employee to the resource tracked in the Calendar. This method should only be called when Calendar Resource Dict has been initialised with the createCalendarRange function'''
+        list_of_new_employees.append( {start_date: employee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft)})
         sd = start_date
         ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')
         delta = ed - sd
         for i in range(delta.days +1):
             if sd+ dt.timedelta(days=i) not in calendar_resource_dict:
-                calendar_resource_dict[sd + dt.timedelta(days=i)] = [{list_of_employees[-1].getEmpId(): list_of_employees[-1].getTotalHoursPerDay(), "Craft" : list_of_employees[-1].getCraft().capitalize()}]
+                calendar_resource_dict[sd + dt.timedelta(days=i)] = [{emp_id: total_hours_per_day, "Craft" : craft.capitalize()}]
             else:
-                calendar_resource_dict[sd + dt.timedelta(days=i)].append({list_of_employees[-1].getEmpId():list_of_employees[-1].getTotalHoursPerDay(), "Craft" : list_of_employees[-1].getCraft().capitalize()})
+                calendar_resource_dict[sd + dt.timedelta(days=i)].append({emp_id: total_hours_per_day, "Craft" : craft.capitalize()})
     
     @staticmethod
     def removeEmployee(emp_id, last_day ,craft, list_of_leaving_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
