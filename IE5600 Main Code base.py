@@ -65,7 +65,7 @@ def main():
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
 
                                         cf.createCalendarRange(calendar_start_date, calendar_end_date, calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2032
-                                        print(calendar_resource_dict)
+                                        
                                         break
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical employee attributes are in correct form ""\n""Pls try again""\n""")
@@ -82,7 +82,6 @@ def main():
                                             job_data.append(line.strip().split(","))
                                         job_attributes = job_data.pop(0)
                                         
-                                        print(job_data)
                                         
                                         if len(job_attributes) != 6:
                                             print("ERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
