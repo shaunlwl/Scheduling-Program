@@ -14,6 +14,7 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
                     calendar_resource_dict[sd + dt.timedelta(days=i)] = [{employee.getEmpId(): employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()}]
                 else:
                     calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId():employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()})
+        print("Resource Tool initialised, Tool has been set up for use""\n""")
     else:
         print("ERROR: You have already initialised the Resource Calendar""\n""")
 
@@ -140,29 +141,59 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
 
 
 def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict):
-    '''This function returns the best available schedule for the current job based on an assumption that the start date can be same or later (due to preparation of pre-work logistics etc.) but a flexible due date'''
-    current_date = start_date
-    recommended_date_range = []
-    while resources != 0:
-        for employee in calendar_resource_dict[current_date]:
-            if list(employee.values())[1].lower() == craft.lower() and list(employee.values())[0] !=0:
-                if resources >= list(employee.values())[0]:
-                    resources -= list(employee.values())[0]
-                    recommended_date_range.append(current_date)
-                    if resources == 0:
-                        break
-                else:
-                    resources -= resources
-                    recommended_date_range.append(current_date)
-                    break
+    '''This function returns the best available schedule for the current job based on either the flexibility of the start date or due date'''
+    while True:
+        user_input = input("Please input if the (1) Job Start Date or (2) Job Due Date is flexible:\nInput (1), (2):")
+        if user_input == "2":
+            current_date = start_date
+            recommended_date_range = []
+            while resources != 0:
+                for employee in calendar_resource_dict[current_date]:
+                    if list(employee.values())[1].lower() == craft.lower() and list(employee.values())[0] !=0:
+                        if resources >= list(employee.values())[0]:
+                            resources -= list(employee.values())[0]
+                            recommended_date_range.append(current_date)
+                            if resources == 0:
+                                break
+                        else:
+                            resources -= resources
+                            recommended_date_range.append(current_date)
+                            break
+                    else:
+                        continue
+                current_date += dt.timedelta(days=1)
+            if len(recommended_date_range) == 1:
+                return recommended_date_range[0], None
             else:
-                continue
-        current_date += dt.timedelta(days=1)
-    if len(recommended_date_range) == 1:
-        return recommended_date_range[0], None
-    else:
-        return recommended_date_range[0], recommended_date_range[-1]
+                return recommended_date_range[0], recommended_date_range[-1]
         
+        elif user_input == "1":
+            current_date = start_date
+            recommended_date_range = []
+            while resources != 0:
+                for employee in calendar_resource_dict[current_date]:
+                    if list(employee.values())[1].lower() == craft.lower() and list(employee.values())[0] !=0:
+                        if resources >= list(employee.values())[0]:
+                            resources -= list(employee.values())[0]
+                            recommended_date_range.append(current_date)
+                            if resources == 0:
+                                break
+                        else:
+                            resources -= resources
+                            recommended_date_range.append(current_date)
+                            break
+                    else:
+                        continue
+                current_date -= dt.timedelta(days=1)
+
+            if len(recommended_date_range) == 1:
+                return recommended_date_range[0], None
+            else:
+                return recommended_date_range[-1], recommended_date_range[0]
+
+        else:
+            print("ERROR: You have entered an invalid input, Please try again""\n""")
+            continue
     
 
 
@@ -238,12 +269,16 @@ class employee:
 
     def getCompetency(self):
         return self._competency
+
+    def setCompetency(self,competency):
+        self._competency = competency
     
     def getCraft(self):
         return self._craft
 
-    def setCompetency(self,competency):
-        self._competency = competency
+    def setCrafty(self,craft):
+        self._craft = craft
+
 
     @staticmethod
     def ComputeAvgCompetency(list_of_employees):

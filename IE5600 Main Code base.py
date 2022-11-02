@@ -52,12 +52,12 @@ def main():
                         if user_option_1 == "1": 
                             try:
                                 with open("employee.csv", "r", encoding="utf-8") as file:
-                                    employee_attritbutes = []
+                                    employee_attributes = []
                                     employee_data = []
                                     for line in file:
                                         employee_data.append(line.strip().split(","))
-                                    employee_attritbutes = employee_data.pop(0)
-                                    if len(employee_attritbutes) != 7: #checks that the .csv file has seven columns for instantiation of employee class type
+                                    employee_attributes = employee_data.pop(0)
+                                    if len(employee_attributes) != 7: #checks that the .csv file has seven columns for instantiation of employee class type
                                         print("ERROR: Data from .csv file does not match expected input of seven employee attributes, please try again""\n""")
                                         continue
                                     else:
@@ -113,7 +113,7 @@ def main():
                                     continue                                
 
                             else:
-                                print("ERROR: You have already initialsied the Job Database""\n""") 
+                                print("ERROR: You have already initialised the Job Database""\n""") 
                                 break
 
                 except ValueError:
