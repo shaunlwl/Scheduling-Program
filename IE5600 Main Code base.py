@@ -341,7 +341,7 @@ def main():
 
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("Please input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (in hours), \nTotal cost, \nCraft Required \nInput: ").strip().split(",")
+            user_job_details = input("Please input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (man-hours), \nTotal cost (dollars), \nCraft Required (Metals, Machinery or Instrument/Electrical) \nInput: ").strip().split(",")
             if len(user_job_details) != 6:
                 print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
             else:
