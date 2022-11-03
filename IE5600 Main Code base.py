@@ -4,7 +4,7 @@ import datetime as dt
 def main():    
     calendar_start_date = "2022-12-31" # Application starts working from 31st Dec 2022 onwards only
     calendar_end_date = "2042-12-31"
-    list_of_employees = [] # This list shows current list of employees and includes any known employee that will join in the future but excludes any employee that has submitted a Last Day of Work
+    list_of_employees = [] #Dos not take into account new additions or removal, to look up the relevant employee list for those
     list_of_new_employees = []
     list_of_leaving_employees = []
     list_of_jobs = []
@@ -16,7 +16,7 @@ def main():
 
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
         
-        user_option = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Update Job(s) ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
+        user_option = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Delete Scheduled Job ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicator(s) \nInput (1), (2), (3) or (4): ")
         try:
             if user_option not in ["1", "2", "3", "4"]:
                 raise ValueError
@@ -52,12 +52,12 @@ def main():
                         if user_option_1 == "1": 
                             try:
                                 with open("employee.csv", "r", encoding="utf-8") as file:
-                                    employee_attritbutes = []
+                                    employee_attributes = []
                                     employee_data = []
                                     for line in file:
                                         employee_data.append(line.strip().split(","))
-                                    employee_attritbutes = employee_data.pop(0)
-                                    if len(employee_attritbutes) != 7: #checks that the .csv file has seven columns for instantiation of employee class type
+                                    employee_attributes = employee_data.pop(0)
+                                    if len(employee_attributes) != 7: #checks that the .csv file has seven columns for instantiation of employee class type
                                         print("ERROR: Data from .csv file does not match expected input of seven employee attributes, please try again""\n""")
                                         continue
                                     else:
@@ -65,7 +65,7 @@ def main():
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
 
                                         cf.createCalendarRange(calendar_start_date, calendar_end_date, calendar_resource_dict, list_of_employees) #Scheduling app only works from year 2022 thru 2032
-                                        print(calendar_resource_dict)
+                                        
                                         break
                             except IOError:
                                 print("ERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical employee attributes are in correct form ""\n""Pls try again""\n""")
@@ -82,7 +82,6 @@ def main():
                                             job_data.append(line.strip().split(","))
                                         job_attributes = job_data.pop(0)
                                         
-                                        print(job_data)
                                         
                                         if len(job_attributes) != 6:
                                             print("ERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
@@ -113,7 +112,7 @@ def main():
                                     continue                                
 
                             else:
-                                print("ERROR: You have already initialsied the Job Database""\n""") 
+                                print("ERROR: You have already initialised the Job Database""\n""") 
                                 break
 
                 except ValueError:
@@ -136,8 +135,8 @@ def main():
             
 
 
-        elif user_option == "2": #Add/Remove Employee(s)/Update Job/Task
-            user_option_2 = input("Do you want to:""\n""1 : Add an employee to database ""\n""2 : Remove an employee from database ""\n""3 : Update existing job details \nInput (1), (2) or (3): ")
+        elif user_option == "2": #Add/Remove Employee(s)/Delete Scheduled Job
+            user_option_2 = input("Do you want to:""\n""1 : Add an employee to database ""\n""2 : Remove an employee from database ""\n""3 : Delete a Scheduled Job \nInput (1), (2) or (3): ")
             if user_option_2 not in ["1", "2", "3"]:
                 print("ERROR: You have entered an invalid selection, Please try again")
                 
@@ -220,7 +219,7 @@ def main():
                                     else:
                                         break
                     if employee_input_cleaned == True:
-                        cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_employees, calendar_resource_dict, calendar_end_date)                   
+                        cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_new_employees, calendar_resource_dict, calendar_end_date)                   
                         
 
 
@@ -334,8 +333,44 @@ def main():
 
 
 
-                else: # Update Scheduled Job details
-                    pass
+                else: # Delete Scheduled Job
+                    
+                    user_input = input("Please provide Job ID of Job to be deleted:""\n""").strip()
+                    job_exist = False
+                    index = 0
+                    if len(list_of_jobs) != 0:
+                        for jobs in list_of_jobs: #Check if Job exists in databse
+                            if user_input == jobs.job_id:
+                                job_exist = True
+                                break
+                            index +=1
+
+                    if job_exist == True:
+                        while True:
+                            user_input_1 = input("Job identified in database. Do you confirm Job deletion? Y/N""\n""").lower()
+                            
+                            if user_input_1 == "y":
+
+                                for dates in list_of_jobs[index].employees:
+                                    for employees in list_of_jobs[index].employees[dates]: #{emp_id : total hours allocated}
+                                        for resource in calendar_resource_dict[dates]:
+                                            if list(resource.keys())[0] == list(employees.keys())[0]:
+                                                resource[list(resource.keys())[0]] = list(resource.values())[0] + list(employees.values())[0]
+                                print("Job has been successfully deleted")
+                                
+                                break
+
+                            elif user_input_1 == "n":
+                                print("No action taken by system")
+                                break
+
+                            else:
+                                print("ERROR: You have entered an invalid input, Please try again""\n""")
+                                continue
+
+
+                    else:
+                        print("Job does not exist in database""\n""")
             
 
 
