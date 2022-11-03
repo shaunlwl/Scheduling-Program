@@ -168,7 +168,7 @@ def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_
                 return recommended_date_range[0], recommended_date_range[-1]
         
         elif user_input == "1":
-            current_date = start_date
+            current_date = due_date
             recommended_date_range = []
             while resources != 0:
                 for employee in calendar_resource_dict[current_date]:
@@ -340,11 +340,13 @@ class employee:
                 if dates < out_of_company_date:
                     continue
                 else:
-                    for employee in job.employees[dates]: #Looping through the employees tagged to a job on a certain date
-                        if list(employee.keys())[0] == emp_id:
+                    while i < len(job.employees[dates]): #Looping through the employees tagged to a job on a certain date
+                        if list(job.employees[dates][i].keys())[0] == emp_id:
                             list_of_affected_jobs.append(job)
                             list_of_affected_jobs_id.append(job.job_id)
                             affected_resources = list(employee.values())[0] #Store how many hours is affected for that day(dates)
+                            
+                            del job.employees[dates][i] # Delete the leaving employee's commitment to the job
                             
                             calendar_reschedule_date_loop = dates #Assign a looping variable to the dates (which signify the affected date)
 
