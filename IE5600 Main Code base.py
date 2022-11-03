@@ -335,7 +335,7 @@ def main():
 
                 else: # Delete Scheduled Job
                     
-                    user_input = input("Please provide Job ID of Job to be deleted:""\n""").strip()
+                    user_input = input("Please provide ID (e.g. #1010) of Job to be deleted:""\n""").strip()
                     job_exist = False
                     index = 0
                     if len(list_of_jobs) != 0:
