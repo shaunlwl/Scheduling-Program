@@ -65,11 +65,10 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
                 continue # go to the next employee
         start_date += dt.timedelta(days=1)
     
-    print("SUCCESS! Job {} has been scheduled with ID {} and Start date: {}".format(job_name, job_id, job_start_date.date()))
+    print("\nSUCCESS! Job {} has been scheduled with ID {} and Start date: {}".format(job_name, job_id, job_start_date.date()))
     print("Here are the allocated employee IDs and their allocated work hours for this job: \n(i.e. Date: yyyy-mm-dd --> [{Employee ID: Work Hour(s)}])")
     for dates in list_of_jobs[-1].employees:
         print("      Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
-    print("\n")
     
 
 
@@ -144,7 +143,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
 def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict):
     '''This function returns the best available schedule for the current job based on either the flexibility of the start date or due date'''
     while True:
-        user_input = input("Please input if the (1) Job Start Date or (2) Job Due Date is flexible:\nInput (1), (2):")
+        user_input = input("Please input which of the job dates is flexible - \n1 : Start Date, or \n2 : Due Date \nInput (1) or (2): ")
         if user_input == "2":
             current_date = start_date
             recommended_date_range = []

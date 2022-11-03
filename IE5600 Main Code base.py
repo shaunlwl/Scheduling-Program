@@ -335,11 +335,11 @@ def main():
 
                 else: # Delete Scheduled Job
                     
-                    user_input = input("Please provide Job ID of Job to be deleted:""\n""").strip()
+                    user_input = input("Please provide ID (e.g. #1010) of Job to be deleted:""\n""").strip()
                     job_exist = False
                     index = 0
                     if len(list_of_jobs) != 0:
-                        for jobs in list_of_jobs: #Check if Job exists in databse
+                        for jobs in list_of_jobs: #Check if Job exists in database
                             if user_input == jobs.job_id:
                                 job_exist = True
                                 break
@@ -376,7 +376,7 @@ def main():
 
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("Please input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (in hours), \nTotal cost, \nCraft Required \nInput: ").strip().split(",")
+            user_job_details = input("Please input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (man-hours), \nTotal cost (dollars), \nCraft Required (Metals, Machinery or Instrument/Electrical) \nInput: ").strip().split(",")
             if len(user_job_details) != 6:
                 print("ERROR: You have entered an invalid amount of inputs, Please try again""\n""")
             else:
@@ -482,7 +482,7 @@ def main():
 
 
         while True: 
-            user_option_continuation = input("Do you want to proceed with another action? Y/N ""\n""").lower()
+            user_option_continuation = input("\nDo you want to proceed with another action? Y/N ""\n""").lower()
             if user_option_continuation in ["n", "y"]:
                 break
             else:
