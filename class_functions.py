@@ -143,7 +143,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
 def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict):
     '''This function returns the best available schedule for the current job based on either the flexibility of the start date or due date'''
     while True:
-        user_input = input("Please input if the (1) Job Start Date or (2) Job Due Date is flexible:\nInput (1), (2):")
+        user_input = input("Please input which of the job dates is flexible - \n1 : Start Date, or \n2 : Due Date \nInput (1) or (2): ")
         if user_input == "2":
             current_date = start_date
             recommended_date_range = []
