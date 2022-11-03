@@ -14,7 +14,7 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
                     calendar_resource_dict[sd + dt.timedelta(days=i)] = [{employee.getEmpId(): employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()}]
                 else:
                     calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId():employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()})
-        print("Resource Tool initialised, Tool has been set up for use""\n""")
+        print("\n** Resource Tool initialised, Tool has been set up for use **""\n""")
         
     else:
         print("ERROR: You have already initialised the Resource Calendar""\n""")
@@ -191,7 +191,7 @@ def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_
                         continue
                 current_date -= dt.timedelta(days=1)
                 if current_date < calendar_start_date:
-                    print("Job can only be scheduled before Resource Tool Working Range of Start Date: {}, Please set the Job End Date to be flexible and try again""\n""".format(calendar_start_date))
+                    print("Job can only be scheduled before Resource Tool Working Range of Start Date: {}, Please set the Job Due Date to be flexible and try again""\n""".format(calendar_start_date))
                     return None, None
 
             if len(recommended_date_range) == 1:
@@ -323,7 +323,7 @@ class employee:
                 employee_already_added = True
                 break
         if employee_already_added == True:
-            print("This employee has already been recorded in the system with a scheduled start date") 
+            print("\nThis employee has already been recorded in the system with a scheduled start date") 
         else:
             list_of_new_employees.append( {start_date: employee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft)})
             sd = start_date
@@ -344,125 +344,176 @@ class employee:
                 employee_already_removed = True
                 break
         if employee_already_removed == True:
-            print("This employee has already been recorded in the system with a scheduled last working day")
+            print("\nThis employee has already been recorded in the system with a scheduled last working day")
         else:
+            list_of_unable_to_reschedule_hours = [] #For the very edge case if reschdule date goes past calendar_end_date
             list_of_leaving_employees.append({last_day + dt.timedelta(days=1): emp_id}) #Add to list of leaving employees so that when current employee list is pulled, there will be a check with the list_of_leaving_employees first
+            
             out_of_company_date = last_day + dt.timedelta(days=1) #Employee is still considered working on Last Day of Work
+            
             ed = dt.datetime.strptime(calendar_end_date,'%Y-%m-%d')  
-            delta = ed - out_of_company_date
-            for i in range(delta.days +1): 
-                for employees in calendar_resource_dict[out_of_company_date + dt.timedelta(days=i)]:
-                    if list(employees.keys())[0] == emp_id:
-                        calendar_resource_dict[out_of_company_date + dt.timedelta(days=i)].remove(employees) # Removes this particular employee resource from all dates in Calendar Resource starting from Last Day of Work
-            
-        
-            affected_resources = 0
-            list_of_affected_jobs_id = []
-            list_of_affected_jobs = []
-            for job in list_of_jobs:
-                for dates in list(job.employees.keys()): #Looping through the various dates that the job is scheduled to occur
-                    if dates < out_of_company_date:
-                        continue
-                    else:
-                        length = len(job.employees[dates])
-                        i=0
-                        while i < length: #Looping through the employees tagged to a job on a certain date
-                            if list(job.employees[dates][i].keys())[0] == emp_id:
-                                list_of_affected_jobs.append(job)
-                                list_of_affected_jobs_id.append(job.job_id)
-                                affected_resources = list(job.employees[dates][i].values())[0] #Store how many hours is affected for that day(dates)
+            if out_of_company_date > ed:
+                print("Employee will officially leave the company past the Resource Tool working date of {}, No action required as no jobs are scheduled past {}\n".format(calendar_end_date, calendar_end_date))
+            else:
+                delta = ed - out_of_company_date
+                for i in range(delta.days +1): 
+                    for employees in calendar_resource_dict[out_of_company_date + dt.timedelta(days=i)]:
+                        if list(employees.keys())[0] == emp_id:
+                            calendar_resource_dict[out_of_company_date + dt.timedelta(days=i)].remove(employees) # Removes this particular employee resource from all dates in Calendar Resource starting from Last Day of Work
+                
+                
+                affected_resources = 0
+                list_of_affected_jobs_id = []
+                list_of_affected_jobs = []
+                for job in list_of_jobs:
+                    unable_to_reschedule_hours = 0 #Only used in the very edge case that hours cannot be rescheduled due to past calendar_end_date
+                    for dates in list(job.employees.keys()): #Looping through the various dates that the job is scheduled to occur
+                        if dates < out_of_company_date:
+                            continue
+                        else:
+                            length = len(job.employees[dates])
+                            i=0
+                            while i < length: #Looping through the employees tagged to a job on a certain date
+                                if list(job.employees[dates][i].keys())[0] == emp_id:
+                                    list_of_affected_jobs.append(job)
+                                    list_of_affected_jobs_id.append(job.job_id)
+                                    affected_resources = list(job.employees[dates][i].values())[0] #Store how many hours is affected for that day(dates)
+                                    
+                                    del job.employees[dates][i] # Delete the leaving employee's commitment to the job
+                                    length -=1
+                                    calendar_reschedule_date_loop = dates #Assign a looping variable to the dates (which signify the affected date)
+
+                                    while affected_resources != 0: #Loop only ends when all the affected resource are rescheduled
+                                        #Rescheduling Algorithm below
+                                        for employees in calendar_resource_dict[calendar_reschedule_date_loop]:
+                                            if list(employees.values())[0] == 0:
+                                                continue
+
+                                            elif list(employees.values())[0] != 0 and affected_resources >= list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower(): #[0] is the index for the employee attribute of TotalHoursPerDay and [1] is the index for employee attribute Craft
+                                                affected_resources = affected_resources - list(employees.values())[0]
+
+                                                if calendar_reschedule_date_loop not in job.employees.keys(): 
+                                                    job.employees[calendar_reschedule_date_loop] = [{list(employees.keys())[0]: list(employees.values())[0]}] #the job.employees attribute will look like this: {2022-01-02: [{emp_id: TotalHoursPerDay}]}
                                 
-                                del job.employees[dates][i] # Delete the leaving employee's commitment to the job
-                                length -=1
-                                calendar_reschedule_date_loop = dates #Assign a looping variable to the dates (which signify the affected date)
+                                                else:
+                                                    employee_exist_in_key = False
+                                                    index = 0
+                                                    for items in job.employees[calendar_reschedule_date_loop]:
+                                                        if list(items.keys())[0] == list(employees.keys())[0]:
+                                                            employee_exist_in_key = True
+                                                            break
+                                                        index +=1
 
-                                while affected_resources != 0: #Loop only ends when all the affected resource are rescheduled
-                                    #Rescheduling Algorithm below
-                                    for employees in calendar_resource_dict[calendar_reschedule_date_loop]:
-                                        if list(employees.values())[0] == 0:
-                                            continue
-
-                                        elif list(employees.values())[0] != 0 and affected_resources >= list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower(): #[0] is the index for the employee attribute of TotalHoursPerDay and [1] is the index for employee attribute Craft
-                                            affected_resources = affected_resources - list(employees.values())[0]
-
-                                            if calendar_reschedule_date_loop not in job.employees.keys(): 
-                                                job.employees[calendar_reschedule_date_loop] = [{list(employees.keys())[0]: list(employees.values())[0]}] #the job.employees attribute will look like this: {2022-01-02: [{emp_id: TotalHoursPerDay}]}
+                                                    if employee_exist_in_key == True:
+                                                        current_employee_resource_allocated =list(job.employees[calendar_reschedule_date_loop][index].values())[0]
+                                                        job.employees[calendar_reschedule_date_loop][index] = {list(employees.keys())[0]: current_employee_resource_allocated + list(employees.values())[0]}
+                                                    else:
+                                                        job.employees[calendar_reschedule_date_loop].append({list(employees.keys())[0]: list(employees.values())[0]}) #deduct the available time to be 0 in the calendar dictionary
                             
+                                                employees[list(employees.keys())[0]]= 0
+
+                                                if affected_resources == 0:
+                                                    if calendar_reschedule_date_loop > job.scheduled_end_date:
+                                                        
+                                                        job.scheduled_end_date = calendar_reschedule_date_loop
+                                                    else:
+                                                        pass
+                                                    break
+                            
+                            
+                                            elif list(employees.values())[0] != 0 and affected_resources < list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower():
+                                            
+                                                employees[list(employees.keys())[0]]= list(employees.values())[0] - affected_resources
+                                                
+                                                if calendar_reschedule_date_loop not in list(job.employees.keys()):
+                                                    job.employees[calendar_reschedule_date_loop] = [{list(employees.keys())[0]: affected_resources}]
+                                                
+                                                else:
+                                                    employee_exist_in_key = False
+                                                    index = 0
+                                                    for items in job.employees[calendar_reschedule_date_loop]:
+                                                        if list(items.keys())[0] == list(employees.keys())[0]:
+                                                            employee_exist_in_key = True
+                                                            break
+                                                        index +=1
+
+                                                    if employee_exist_in_key == True:
+                                                        current_employee_resource_allocated =list(job.employees[calendar_reschedule_date_loop][index].values())[0]
+                                                        job.employees[calendar_reschedule_date_loop][index] = {list(employees.keys())[0]: current_employee_resource_allocated + affected_resources}
+                                                    else:
+                                                        job.employees[calendar_reschedule_date_loop].append({list(employees.keys())[0]: affected_resources})
+                            
+                            
+                                                affected_resources = affected_resources- affected_resources #affected_resources = 0
+
+
+                                                if affected_resources == 0:
+                                                    if calendar_reschedule_date_loop > job.scheduled_end_date:
+                                                        
+                                                        job.scheduled_end_date = calendar_reschedule_date_loop
+                                                    else:
+                                                        pass
+                                                    break
+                        
                                             else:
-                                                employee_exist_in_key = False
+                                                continue 
+                                        calendar_reschedule_date_loop += dt.timedelta(days=1)
+                                        if calendar_reschedule_date_loop > ed:
+                                            unable_to_reschedule_hours += affected_resources
+                                            affected_resources = 0
+
+                                            if len(list_of_unable_to_reschedule_hours) == 0:
+                                                
+                                                list_of_unable_to_reschedule_hours.append({job.job_id : unable_to_reschedule_hours})
+                                            else:
+                                                job_in_list = False
                                                 index = 0
-                                                for items in job.employees[calendar_reschedule_date_loop]:
-                                                    if list(items.keys())[0] == list(employees.keys())[0]:
-                                                        employee_exist_in_key = True
+                                                for items in list_of_unable_to_reschedule_hours:
+                                                    if list(items.keys())[0] == job.job_id:
+                                                        list_of_unable_to_reschedule_hours[index] = {job.job_id : unable_to_reschedule_hours}
+                                                        job_in_list = True
                                                         break
                                                     index +=1
+                                                if job_in_list  == False:
+                                                    list_of_unable_to_reschedule_hours.append({job.job_id : unable_to_reschedule_hours})
 
-                                                if employee_exist_in_key == True:
-                                                    current_employee_resource_allocated =list(job.employees[calendar_reschedule_date_loop][index].values())[0]
-                                                    job.employees[calendar_reschedule_date_loop][index] = {list(employees.keys())[0]: current_employee_resource_allocated + list(employees.values())[0]}
-                                                else:
-                                                    job.employees[calendar_reschedule_date_loop].append({list(employees.keys())[0]: list(employees.values())[0]}) #deduct the available time to be 0 in the calendar dictionary
-                        
-                                            employees[list(employees.keys())[0]]= 0
+                                        #End of Rescheduling algorithm
+                                i +=1
+                list_of_affected_jobs = list(set(list_of_affected_jobs))
+                list_of_affected_jobs_id = list(set(list_of_affected_jobs_id))
+                
+                
+                print("These jobs (by Job ID) are affected by employee last day of work on {} and leaving on {}:""\n""{}\n".format(last_day.date(), out_of_company_date.date(), list_of_affected_jobs_id))
+                
+                i = 0
+               
+                while i < len(list_of_affected_jobs):
+                    j = 0
+                    job_exist_in_unable_to_schedule_list = False
+                    while j < len(list_of_unable_to_reschedule_hours):
+                        if list_of_affected_jobs[i].job_id == list(list_of_unable_to_reschedule_hours[j].keys())[0]:
+                            del list_of_affected_jobs[i]
+                            
+                            job_exist_in_unable_to_schedule_list = True
+                            break
+                        else:
+                            j +=1
+                    if job_exist_in_unable_to_schedule_list == False:
+                        i +=1
+                    else:
+                        pass
 
-                                            if affected_resources == 0:
-                                                if calendar_reschedule_date_loop > job.scheduled_end_date:
-                                                    
-                                                    job.scheduled_end_date = calendar_reschedule_date_loop
-                                                else:
-                                                    pass
-                                                break
-                        
-                        
-                                        elif list(employees.values())[0] != 0 and affected_resources < list(employees.values())[0] and list(employees.values())[1].lower() == craft.lower():
-                                        
-                                            employees[list(employees.keys())[0]]= list(employees.values())[0] - affected_resources
-                                            
-                                            if calendar_reschedule_date_loop not in list(job.employees.keys()):
-                                                job.employees[calendar_reschedule_date_loop] = [{list(employees.keys())[0]: affected_resources}]
-                                            
-                                            else:
-                                                employee_exist_in_key = False
-                                                index = 0
-                                                for items in job.employees[calendar_reschedule_date_loop]:
-                                                    if list(items.keys())[0] == list(employees.keys())[0]:
-                                                        employee_exist_in_key = True
-                                                        break
-                                                    index +=1
-
-                                                if employee_exist_in_key == True:
-                                                    current_employee_resource_allocated =list(job.employees[calendar_reschedule_date_loop][index].values())[0]
-                                                    job.employees[calendar_reschedule_date_loop][index] = {list(employees.keys())[0]: current_employee_resource_allocated + affected_resources}
-                                                else:
-                                                    job.employees[calendar_reschedule_date_loop].append({list(employees.keys())[0]: affected_resources})
-                        
-                        
-                                            affected_resources = affected_resources- affected_resources #affected_resources = 0
-
-
-                                            if affected_resources == 0:
-                                                if calendar_reschedule_date_loop > job.scheduled_end_date:
-                                                    
-                                                    job.scheduled_end_date = calendar_reschedule_date_loop
-                                                else:
-                                                    pass
-                                                break
+                for jobs in list_of_affected_jobs:    
                     
-                                        else:
-                                            continue 
-                                    calendar_reschedule_date_loop += dt.timedelta(days=1)
-                                    #End of Rescheduling algorithm
-                            i +=1
-            set_of_affected_jobs = set(list_of_affected_jobs)
-            set_of_affected_jobs_id = set(list_of_affected_jobs_id)
-            print("These jobs (by Job ID) are affected by employee last day of work on {} and leaving on {}:""\n""{}".format(last_day.date(), out_of_company_date.date(), set_of_affected_jobs_id))
-            for jobs in set_of_affected_jobs:
-                print("Job ID: {} with Planned due date {} ---> New Scheduled End Date {}""\n""".format( jobs.job_id ,jobs.due_date.date(), jobs.scheduled_end_date.date()))
+                    print("Job ID: {} with Planned due date {} ---> New Scheduled End Date {}""\n""".format( jobs.job_id ,jobs.due_date.date(), jobs.scheduled_end_date.date()))
+                
+                if len(list_of_unable_to_reschedule_hours) !=0:
+
+                    print("Here is a list of job(s) (by Job ID) and their total affected hours that cannot be fully rescheduled due to employee leaving: \n{}""\n""".format(list_of_unable_to_reschedule_hours))
+            
+
+
 
         
-
-
-
-    
-            
+                
 

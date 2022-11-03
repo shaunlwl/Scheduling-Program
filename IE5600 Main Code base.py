@@ -396,11 +396,14 @@ def main():
                     except ValueError:
                         print("ERROR: You have entered an invalid date format, Please try again""\n""")
                     else:
-                     
-                        check_results, start_date, due_date = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, dt.datetime.strptime(calendar_start_date, '%Y-%m-%d'), dt.datetime.strptime(calendar_end_date, '%Y-%m-%d'))
-                        if check_results == True:
-                            cf.scheduleJob(user_job_details[0],start_date, due_date,user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
-                            job_id += 1
+                        user_job_details[5] = user_job_details[5].lower()
+                        if user_job_details[5] not in ["metals", "machinery", "instrument/electrical"]:
+                            print(print("ERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical"))
+                        else:
+                            check_results, start_date, due_date = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, dt.datetime.strptime(calendar_start_date, '%Y-%m-%d'), dt.datetime.strptime(calendar_end_date, '%Y-%m-%d'))
+                            if check_results == True:
+                                cf.scheduleJob(user_job_details[0],start_date, due_date,user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
+                                job_id += 1
 
 
 
