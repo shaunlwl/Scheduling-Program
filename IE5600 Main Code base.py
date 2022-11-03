@@ -339,7 +339,7 @@ def main():
                     job_exist = False
                     index = 0
                     if len(list_of_jobs) != 0:
-                        for jobs in list_of_jobs: #Check if Job exists in databse
+                        for jobs in list_of_jobs: #Check if Job exists in database
                             if user_input == jobs.job_id:
                                 job_exist = True
                                 break
