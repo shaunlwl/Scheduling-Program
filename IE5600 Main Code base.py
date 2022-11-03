@@ -356,6 +356,7 @@ def main():
                                         for resource in calendar_resource_dict[dates]:
                                             if list(resource.keys())[0] == list(employees.keys())[0]:
                                                 resource[list(resource.keys())[0]] = list(resource.values())[0] + list(employees.values())[0]
+                                del list_of_jobs[index]
                                 print("Job has been successfully deleted")
                                 
                                 break
