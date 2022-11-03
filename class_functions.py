@@ -426,7 +426,7 @@ class employee:
                                         continue 
                                 calendar_reschedule_date_loop += dt.timedelta(days=1)
                                 #End of Rescheduling algorithm
-
+                        i +=1
         set_of_affected_jobs = set(list_of_affected_jobs)
         set_of_affected_jobs_id = set(list_of_affected_jobs_id)
         print("These jobs (by Job ID) are affected by employee last day of work on {} and leaving on {}:""\n""{}".format(last_day.date(), out_of_company_date.date(), set_of_affected_jobs_id))
