@@ -482,7 +482,7 @@ def main():
 
 
         while True: 
-            user_option_continuation = input("Do you want to proceed with another action? Y/N ""\n""").lower()
+            user_option_continuation = input("\nDo you want to proceed with another action? Y/N ""\n""").lower()
             if user_option_continuation in ["n", "y"]:
                 break
             else:
