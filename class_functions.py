@@ -340,14 +340,15 @@ class employee:
                 if dates < out_of_company_date:
                     continue
                 else:
-                    while i < len(job.employees[dates]): #Looping through the employees tagged to a job on a certain date
+                    length = len(job.employees[dates])
+                    while i < length: #Looping through the employees tagged to a job on a certain date
                         if list(job.employees[dates][i].keys())[0] == emp_id:
                             list_of_affected_jobs.append(job)
                             list_of_affected_jobs_id.append(job.job_id)
                             affected_resources = list(employee.values())[0] #Store how many hours is affected for that day(dates)
                             
                             del job.employees[dates][i] # Delete the leaving employee's commitment to the job
-                            
+                            length -=1
                             calendar_reschedule_date_loop = dates #Assign a looping variable to the dates (which signify the affected date)
 
                             while affected_resources != 0: #Loop only ends when all the affected resource are rescheduled
