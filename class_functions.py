@@ -1,4 +1,5 @@
 import datetime as dt
+import csv
 
 
 def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_employees):
@@ -222,7 +223,7 @@ class job:
             print("ERROR: Job attribute(s) that are expected to be numerical or date format are not in the correct form, please change to numerical/date form""\n""")
             raise IOError
         self.craft = craft
-        self.scheduled_end_date = None #This is the scheduled end date in the system (maybe same or different from the planned due date input by user)  
+        self.scheduled_end_date = None #This is the scheduled end date in the system (maybe same or different from the planned due date/deadline input by user)  
              
 
 
@@ -284,27 +285,23 @@ class employee:
     def getCraft(self):
         return self._craft
 
-    def setCrafty(self,craft):
+    def setCraft(self,craft):
         self._craft = craft
 
 
     @staticmethod
-    def ComputeAvgCompetency(list_of_employees):
-        total_competency =  0
-        for employees in list_of_employees:
-            total_competency += employees.getCompetency()
-        return total_competency/len(list_of_employees)
-
-    @staticmethod
-    def CurrentEmployeeCount(list_of_employees, list_of_new_employees, list_of_leaving_employees, current_date):
+    def CurrentEmployeeList(list_of_employees, list_of_new_employees, list_of_leaving_employees, current_date):
         temp_list_of_employees = list_of_employees
         for items in list_of_leaving_employees: #list of leaving employees track the actual out of office date (last day + 1 day)
             if current_date < list(items.keys())[0]:
                 continue
             else:
-                for employees in temp_list_of_employees:
-                    if employees.getEmpId() == list(items.values())[0]:
-                        temp_list_of_employees.remove(employees)
+                i = 0
+                while i < len(temp_list_of_employees):
+                    if temp_list_of_employees[i].getEmpId() == list(items.values())[0]:
+                        del temp_list_of_employees[i]
+                        continue
+                    i += 1
         
         for items in list_of_new_employees:
             if current_date >= list(items.keys())[0]:
@@ -312,7 +309,7 @@ class employee:
             else:
                 continue
     
-        return len(temp_list_of_employees)      
+        return temp_list_of_employees      
 
     @staticmethod      
     def addEmployee(emp_id, first_name, last_name, hourly_rate, total_hours_per_day, competency, craft, start_date, list_of_new_employees, calendar_resource_dict, calendar_end_date):
@@ -334,7 +331,9 @@ class employee:
                     calendar_resource_dict[sd + dt.timedelta(days=i)] = [{emp_id: total_hours_per_day, "Craft" : craft.capitalize()}]
                 else:
                     calendar_resource_dict[sd + dt.timedelta(days=i)].append({emp_id: total_hours_per_day, "Craft" : craft.capitalize()})
-    
+            print("\nEmployee {} successfully added to database\n".format(emp_id))
+
+
     @staticmethod
     def removeEmployee(emp_id, last_day ,craft, list_of_leaving_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
         '''This method removes the employee from the Calendar resource data structure and reschedules the affected hours of every job due to employee leaving based on last day of work + 1 day (Out of company date)'''
@@ -481,7 +480,7 @@ class employee:
                                 i +=1
                 list_of_affected_jobs = list(set(list_of_affected_jobs))
                 list_of_affected_jobs_id = list(set(list_of_affected_jobs_id))
-                
+                print("\nEmployee {} has been successfully removed from database\n".format(emp_id))
                 
                 print("These jobs (by Job ID) are affected by employee last day of work on {} and leaving on {}:""\n""{}\n".format(last_day.date(), out_of_company_date.date(), list_of_affected_jobs_id))
                 
@@ -505,7 +504,7 @@ class employee:
 
                 for jobs in list_of_affected_jobs:    
                     
-                    print("Job ID: {} with Planned due date {} ---> New Scheduled End Date {}""\n""".format( jobs.job_id ,jobs.due_date.date(), jobs.scheduled_end_date.date()))
+                    print("Job ID: {} with a deadline: {} ---> New Scheduled End Date {}""\n""".format( jobs.job_id ,jobs.due_date.date(), jobs.scheduled_end_date.date()))
                 
                 if len(list_of_unable_to_reschedule_hours) !=0:
 
