@@ -464,18 +464,20 @@ class employee:
                                             if len(list_of_unable_to_reschedule_hours) == 0:
                                                 
                                                 list_of_unable_to_reschedule_hours.append({job.job_id : unable_to_reschedule_hours})
+                                                job.scheduled_end_date = "Job cannot be completed"
                                             else:
                                                 job_in_list = False
                                                 index = 0
                                                 for items in list_of_unable_to_reschedule_hours:
                                                     if list(items.keys())[0] == job.job_id:
                                                         list_of_unable_to_reschedule_hours[index] = {job.job_id : unable_to_reschedule_hours}
+                                                        job.scheduled_end_date = "Job cannot be completed"
                                                         job_in_list = True
                                                         break
                                                     index +=1
                                                 if job_in_list  == False:
                                                     list_of_unable_to_reschedule_hours.append({job.job_id : unable_to_reschedule_hours})
-
+                                                    job.scheduled_end_date = "Job cannot be completed"
                                         #End of Rescheduling algorithm
                                 i +=1
                 list_of_affected_jobs = list(set(list_of_affected_jobs))
@@ -508,7 +510,7 @@ class employee:
                 
                 if len(list_of_unable_to_reschedule_hours) !=0:
 
-                    print("Here is a list of job(s) (by Job ID) and their total affected hours that cannot be fully rescheduled due to employee leaving: \n{}""\n""".format(list_of_unable_to_reschedule_hours))
+                    print("Here is a list of job(s) (by Job ID) and their total affected hours that cannot be fully rescheduled (i.e Job cannot be completed) due to employee leaving: \n{}""\n""".format(list_of_unable_to_reschedule_hours))
             
 
 

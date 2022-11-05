@@ -183,12 +183,18 @@ def main():
                                 else:
                                     break
                             try:
-                                employee_details[0] = int(employee_details[0])
+                                employee_details[0] = int(employee_details[0]) #Employee ID variation is allowable due to possible difference in employee type (such as contractor vs full-time), however, has to be integer form
                                 employee_details[3] = float(employee_details[3])
                                 employee_details[4] = float(employee_details[4])
                                 employee_details[5] = float(employee_details[5])
+                                if employee_details[3] < 0 or employee_details[4] < 0 or employee_details[5] < 0:
+                                    print("\nERROR: Employee details for Hourly Rate, Total Hours Per Day and Competency are expected to be more than 0, Please try again\n")
+                                    break
+                                if employee_details[4] > 12:
+                                    print("\nERROR: Employee's Total Hours Per Day cannot be more than 12 Hours\n")
+                                    break
                             except ValueError:
-                                print("\nERROR: Please check inputs for Employee Id, Hourly Rate, Total hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
+                                print("\nERROR: Please check inputs for Employee Id, Hourly Rate, Total Hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
                                 user_option_reselect= input("\nDo you want to re-input employee details? Y/N""\n""").lower()
                                 while True:
                                     if user_option_reselect in ["y", "n"]:
@@ -402,6 +408,9 @@ def main():
                 try:
                     user_job_details[3] = float(user_job_details[3])
                     user_job_details[4] = float(user_job_details[4])
+                    if user_job_details[3] < 0 or user_job_details[4] < 0:
+                        print("\nERROR: Resources Required and Total Cost of the job cannot be less than 0, Please try again\n")
+                        raise ValueError
                 except ValueError:
                     print("\nERROR: You have entered an invalid format for Resources or Total Cost, Please try again""\n""")
                 else:
