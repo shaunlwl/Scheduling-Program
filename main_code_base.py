@@ -3,8 +3,8 @@ import datetime as dt
 import csv
 
 def main():    
-    calendar_start_date = "2022-12-31" # Application starts working from 31st Dec 2022 onwards only
-    calendar_end_date = "2042-12-31"
+    calendar_start_date = "2022-12-31" # Tool can schedule jobs from 31st Dec 2022 onwards only
+    calendar_end_date = "2042-12-31" #Tool will not be able to schedule any jobs past this date
     list_of_employees = [] #Does not take into account new additions or removal, to look up the relevant employee list for those
     list_of_new_employees = [] #Holds all new hires scheduled to join in the Tool
     list_of_leaving_employees = []  #Holds all planned attrition in the Tool
@@ -686,7 +686,7 @@ def main():
                                     while sd <= ed:
                                         for jobs in list_of_jobs:
                                             if jobs.scheduled_end_date == sd:
-                                                list_of_jobs_completed_on_selected_dates.append({"Completed Date": jobs.scheduled_end_date.date(), jobs.job_id: jobs.total_cost })
+                                                list_of_jobs_completed_on_selected_dates.append({"Completed Date": "{}".format(jobs.scheduled_end_date.date()), jobs.job_id: jobs.total_cost })
 
                                         sd += dt.timedelta(days=1)
 

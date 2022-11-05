@@ -3,7 +3,7 @@ import csv
 
 
 def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_employees):
-    '''This function initialises the date range (using a dictionary) for which our scheduling application works'''
+    '''This function initialises the date range (using a dictionary) for which our scheduling application works, data structure is three dimensional in nature'''
     if calendar_resource_dict == {}: #Safeguard to ensure that Calendar is not initialised twice
         sd = dt.datetime.strptime(start_date, '%Y-%m-%d')
         ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
