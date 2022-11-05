@@ -225,7 +225,13 @@ def main():
                                     else:
                                         break
                     if employee_input_cleaned == True:
-                        cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_new_employees, calendar_resource_dict, calendar_end_date)                   
+                        employee_already_exist = False
+                        for employees in list_of_employees:
+                            if employee_details[0] == employees.getEmpId():
+                                print("\nEmployee with ID: {} already exist in database\n".format(employee_details[0]))
+                                employee_already_exist = True
+                        if employee_already_exist == False:
+                            cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_new_employees, calendar_resource_dict, calendar_end_date)                   
                         
 
 
