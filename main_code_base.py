@@ -90,7 +90,7 @@ def main():
                                             continue
                                         else:                                        
                                             if calendar_resource_dict == {}:
-                                                print("\nERROR: Please initialise Resource Calendar as a first step before adding scheduled jobs by adding employee database""\n""")
+                                                print("\n** Please initialise Resource Tool with Employees as a first step before adding scheduled jobs **""\n""")
                                                 break
                                             
                                             for items in job_data: # this creates the job objects and assumes that the .csv file has the same columns in the right order (refer to job class __init__ ordering)
@@ -399,36 +399,46 @@ def main():
 
 
         elif user_option == "3": #Schedule a Job
-            user_job_details = input("\nPlease input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (man-hours), \nTotal cost (dollars), \nCraft Required (Metals, Machinery or Instrument/Electrical) \nInput: ").strip().split(",")
-            if len(user_job_details) != 6:
-                print("\nERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+            if calendar_resource_dict == {}:
+                print("\n** Please initialise the Resource Tool with Employees before scheduling any jobs **\n")
             else:
-                for i in range(len(user_job_details)):
-                    user_job_details[i] = user_job_details[i].strip()
-                try:
-                    user_job_details[3] = float(user_job_details[3])
-                    user_job_details[4] = float(user_job_details[4])
-                    if user_job_details[3] < 0 or user_job_details[4] < 0:
-                        print("\nERROR: Resources Required and Total Cost of the job cannot be less than 0, Please try again\n")
-                        raise ValueError
-                except ValueError:
-                    print("\nERROR: You have entered an invalid format for Resources or Total Cost, Please try again""\n""")
+                user_job_details = input("\nPlease input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (man-hours), \nTotal cost (dollars), \nCraft Required (Metals, Machinery or Instrument/Electrical) \nInput: ").strip().split(",")
+                if len(user_job_details) != 6:
+                    print("\nERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                 else:
+                    for i in range(len(user_job_details)):
+                        user_job_details[i] = user_job_details[i].strip()
                     try:
-                        user_job_details[1] = dt.datetime.strptime(user_job_details[1],'%Y-%m-%d')
-                        user_job_details[2] = dt.datetime.strptime(user_job_details[2],'%Y-%m-%d')
-                    
+                        user_job_details[3] = float(user_job_details[3])
+                        user_job_details[4] = float(user_job_details[4])
+                        if user_job_details[3] < 0 or user_job_details[4] < 0:
+                            print("\nERROR: Resources Required and Total Cost of the job cannot be less than 0, Please try again\n")
+                            raise ValueError
                     except ValueError:
-                        print("\nERROR: You have entered an invalid date format, Please try again""\n""")
+                        print("\nERROR: You have entered an invalid format for Resources or Total Cost, Please try again""\n""")
                     else:
-                        user_job_details[5] = user_job_details[5].lower()
-                        if user_job_details[5] not in ["metals", "machinery", "instrument/electrical"]:
-                            print(print("\nERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical\n"))
+                        try:
+                            date_range_error = False
+                            user_job_details[1] = dt.datetime.strptime(user_job_details[1],'%Y-%m-%d')
+                            user_job_details[2] = dt.datetime.strptime(user_job_details[2],'%Y-%m-%d')
+                            if user_job_details[1] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d') or user_job_details[2] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d') :
+                                print("\nERROR: Please schedule a job only within the Resource Tool Working Date Range of {} to {}\n".format(calendar_start_date, calendar_end_date))
+                                date_range_error= True
+                                raise ValueError
+                        except ValueError:
+                            if date_range_error == True :
+                                pass
+                            else:
+                                print("\nERROR: You have entered an invalid date format, Please try again""\n""")
                         else:
-                            check_results, start_date, due_date = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, dt.datetime.strptime(calendar_start_date, '%Y-%m-%d'), dt.datetime.strptime(calendar_end_date, '%Y-%m-%d'))
-                            if check_results == True:
-                                cf.scheduleJob(user_job_details[0],start_date, due_date,user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
-                                job_id += 1
+                            user_job_details[5] = user_job_details[5].lower()
+                            if user_job_details[5] not in ["metals", "machinery", "instrument/electrical"]:
+                                print(print("\nERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical\n"))
+                            else:
+                                check_results, start_date, due_date = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, dt.datetime.strptime(calendar_start_date, '%Y-%m-%d'), dt.datetime.strptime(calendar_end_date, '%Y-%m-%d'))
+                                if check_results == True:
+                                    cf.scheduleJob(user_job_details[0],start_date, due_date,user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
+                                    job_id += 1
 
 
 
