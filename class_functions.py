@@ -8,13 +8,15 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
         sd = dt.datetime.strptime(start_date, '%Y-%m-%d')
         ed = dt.datetime.strptime(end_date, '%Y-%m-%d')
         delta = ed - sd
-        # Structure of the dictionary such that {date: [List of employees in dictionary{employee number: available hour, Craft: Craft},...,{}]}
+        # Structure of the dictionary is as such --> {date: [List of employees in dictionary{employee number: available hour, Craft: Craft},...,{}]}
         for i in range(delta.days+1):
             for employee in list_of_employees:
                 if sd + dt.timedelta(days=i) not in calendar_resource_dict:
                     calendar_resource_dict[sd + dt.timedelta(days=i)] = [{employee.getEmpId(): employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()}]
                 else:
                     calendar_resource_dict[sd + dt.timedelta(days=i)].append({employee.getEmpId():employee.getTotalHoursPerDay(), "Craft" : employee.getCraft()})
+        
+        #Calendar data structure is created for date range given as per calendar_start_date and calendar_end_date
         print("\n** Resource Tool initialised, Tool has been set up for use **""\n""")
         
     else:
@@ -27,10 +29,12 @@ def createCalendarRange(start_date, end_date, calendar_resource_dict, list_of_em
 
 def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,calendar_resource_dict, current_job_id, list_of_jobs):
     '''This function only runs when there are sufficient resources within the time period of start date and due date and user confirms schedule (i.e scheduleJobCheck returns True)'''
-    
+    #Job Object is created and appended to list_of_jobs
     job_id = "#" + str(current_job_id)
     list_of_jobs.append(job(job_id, job_name, start_date, due_date, resources, total_cost, craft))
     job_start_date = start_date
+
+    #Resource in the calendar data structure is reduced accordingly as per the Job requirements
     while start_date <= due_date  and resources !=0:
         for employee in calendar_resource_dict[start_date]:
             if list(employee.values())[0] == 0:
@@ -67,10 +71,13 @@ def scheduleJob(job_name, start_date, due_date, resources, total_cost, craft ,ca
                 continue # go to the next employee
         start_date += dt.timedelta(days=1)
     
-    print("\nSUCCESS! Job {} has been scheduled with ID {} and Start date: {}".format(job_name, job_id, job_start_date.date()))
+    #Print out to User
+    print("\nSUCCESS! Job '{}' has been scheduled with ID {} and Start date: {}\n".format(job_name, job_id, job_start_date.date()))
     print("Here are the allocated employee IDs and their allocated work hours for this job: \n(i.e. Date: yyyy-mm-dd --> [{Employee ID: Work Hour(s)}])")
+    print("--" * 40)
     for dates in list_of_jobs[-1].employees:
         print("      Date: {} --> {}".format(dates.date(),list(list_of_jobs[-1].employees[dates])))
+        print("--" * 40)
     
 
 
@@ -80,7 +87,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
     
     current_date = start_date
 
-        
+    #Checks if given dates by the user when scheduling a job has available resources    
     while current_date < due_date + dt.timedelta(days=1):
         for employee in calendar_resource_dict[current_date]: # get all employees
             if list(employee.values())[1].lower() == craft.lower(): # check if same craft
@@ -89,6 +96,8 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                 continue
         current_date += dt.timedelta(days=1)
 
+
+    #If sufficient resource, return True and the given dates by User, Else, return False, so that scheduleJob() function will not be called
     if total_available_hours_within_period >= resources:
         while True:
             user_input = input("Job can be scheduled, do you want to proceed? Y/N""\n""").lower()
@@ -101,6 +110,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                 
         else:
             return False, None, None
+    #If insufficient resources, prompt user if they would like a recommended schedule, if yes, recommendSchedule() function is called      
     else:
         while True:
             user_input = input("Job cannot be scheduled due to unavailable resources, do you want to check for earliest available slot? Y/N""\n""").lower()
@@ -110,6 +120,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                 print("ERROR: You have entered an invalid selection, Please try again""\n""")
         if user_input == "y":
             new_start_date, new_end_date = recommendSchedule(resources, start_date, due_date, craft, calendar_resource_dict, calendar_start_date, calendar_end_date)
+            #Provide the recommended dates to the User for the case of single day completion
             if new_end_date == None and new_start_date != None:
                 while True:
                     user_input = input("Job can be scheduled and fully completed on this date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date())).lower()
@@ -121,7 +132,7 @@ def scheduleJobCheck(job_name, start_date, due_date, resources, total_cost, craf
                     return True, new_start_date, new_start_date
                 else:
                     return False, None, None                       
-                        
+            #Provide the recommended dates to the User for the case of multiple days required for Job completion         
             elif new_start_date != None and new_end_date != None:
                 while True:
                     user_input = input("Job can be scheduled from Start date: {} --> End date: {}, do you want to schedule it? Y/N""\n""".format(new_start_date.date(), new_end_date.date())).lower()
@@ -147,6 +158,8 @@ def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_
     '''This function returns the best available schedule for the current job based on either the flexibility of the start date or due date'''
     while True:
         user_input = input("Please input which of the job dates is flexible - \n1 : Start Date, or \n2 : Due Date \nInput (1) or (2): ")
+        
+        #Case when Job Due Date is flexible (Job start date will be fixed)
         if user_input == "2":
             current_date = start_date
             recommended_date_range = []
@@ -172,7 +185,8 @@ def recommendSchedule(resources, start_date, due_date, craft, calendar_resource_
                 return recommended_date_range[0], None
             else:
                 return recommended_date_range[0], recommended_date_range[-1]
-        
+
+        #Case when Job Start Date is flexible (Job Due Date will be fixed)
         elif user_input == "1":
             current_date = due_date
             recommended_date_range = []
@@ -225,7 +239,7 @@ class job:
         self.craft = craft
         self.scheduled_end_date = None #This is the scheduled end date in the system (maybe same or different from the planned due date/deadline input by user)  
              
-
+#Did not define getter/setter methods as Public Class
 
              
         
@@ -336,7 +350,7 @@ class employee:
 
     @staticmethod
     def removeEmployee(emp_id, last_day ,craft, list_of_leaving_employees, calendar_resource_dict, calendar_end_date, list_of_jobs):
-        '''This method removes the employee from the Calendar resource data structure and reschedules the affected hours of every job due to employee leaving based on last day of work + 1 day (Out of company date)'''
+        '''This method removes the employee from the Calendar resource data structure and automatically reschedules the affected hours of every job due to employee leaving based on last day of work + 1 day (Out of company date)'''
         employee_already_removed = False
         for items in list_of_leaving_employees:
             if list(items.values())[0] == emp_id:
@@ -383,7 +397,10 @@ class employee:
                                     calendar_reschedule_date_loop = dates #Assign a looping variable to the dates (which signify the affected date)
 
                                     while affected_resources != 0: #Loop only ends when all the affected resource are rescheduled
-                                        #Rescheduling Algorithm below
+                                        
+                                        
+                                        
+                                        #Automatic Rescheduling Algorithm below
                                         for employees in calendar_resource_dict[calendar_reschedule_date_loop]:
                                             if list(employees.values())[0] == 0:
                                                 continue
@@ -479,10 +496,12 @@ class employee:
                                                     list_of_unable_to_reschedule_hours.append({job.job_id : unable_to_reschedule_hours})
                                                     job.scheduled_end_date = "Job cannot be completed"
                                         #End of Rescheduling algorithm
+
+
                                 i +=1
                 list_of_affected_jobs = list(set(list_of_affected_jobs))
                 list_of_affected_jobs_id = list(set(list_of_affected_jobs_id))
-                print("\nEmployee {} has been successfully removed from database\n".format(emp_id))
+                print("\n** Employee {} has been successfully removed from database **\n".format(emp_id))
                 
                 print("These jobs (by Job ID) are affected by employee last day of work on {} and leaving on {}:""\n""{}\n".format(last_day.date(), out_of_company_date.date(), list_of_affected_jobs_id))
                 

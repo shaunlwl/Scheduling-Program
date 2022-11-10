@@ -14,10 +14,15 @@ def main():
     job_database_initialised_count = 0 #To prevent job database from initialising twice
     file_generation_count = 0 #Used to create different named .csv files for data persistence
 
-    print("\nRESOURCE MANAGEMENT AND JOB SCHEDULING TOOL ** BETWEEN {} AND {} **".format(calendar_start_date, calendar_end_date))
+
+    print("-" * 95)
+    print("\nFLEXI-INTELLIGENT RESOURCE AND SCHEDULING TOOL (FIRST) ** BETWEEN {} AND {} **\n".format(calendar_start_date, calendar_end_date))
+    print("-" * 95)
+
 
     while True: #Purpose of this while loop is to keep the programme running after the first selection is fully completed (i.e Option 1 or 2 or 3 or 4 is fully completed)
         
+        #INPUT DATA VALIDATION
         user_option = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Delete Scheduled Job ""\n"" 3 : Schedule a Job ""\n"" 4 : Downloading data to .csv files / Cost summary \nInput (1), (2), (3) or (4): ")
         try:
             if user_option not in ["1", "2", "3", "4"]:
@@ -28,7 +33,7 @@ def main():
             while True:
                 user_option_reselect = input("\nERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
                 if user_option_reselect == "y":
-                    user_option= input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees ""\n"" 3 : Schedule a Job ""\n"" 4 : Calculate Key Performance Indicators ""\n""")
+                    user_option= input("\nPlease input a selection between 1 and 4:""\n"" 1 : Upload Employee/Job Database [From .CSV only] ""\n"" 2 : Add/Remove Employees or Delete Scheduled Job ""\n"" 3 : Schedule a Job ""\n"" 4 : Downloading data to .csv files / Cost summary \nInput (1), (2), (3) or (4): ")
                     try:
                         if user_option not in ["1", "2", "3", "4"]:
                             raise ValueError
@@ -41,17 +46,21 @@ def main():
                 else:
                     pass
 
+        #END OF INPUT DATA VALIDATION
 
 
-
-        if user_option == "1": #Upload Employee/Job Database from .csv file format only (Note: Option 1-1 must always be run first to initialise the Resource Calendar)
+        #OPTION 1 SELECTED
+        if user_option == "1": #Upload Employee/Job Database from .csv file format only (Note: Option 1-1 must always be run first to initialise the Resource Calendar (calendar data structure))
             while True:
                 user_option_1 = input("\nWhich database do you want to upload - \n1 : Employee database \n2 : Job database \nInput (1) or (2): ")
+                
+                #INPUT DATA VALIDATION
                 try:
                     if user_option_1 not in ["1", "2"]:
                         raise ValueError
                     else:
                         if user_option_1 == "1": 
+                            #CREATE FILE OBJECT AND READ .CSV FILE
                             try:
                                 with open("employee.csv", "r", encoding="utf-8") as file:
                                     employee_attributes = []
@@ -59,6 +68,8 @@ def main():
                                     for line in file:
                                         employee_data.append(line.strip().split(","))
                                     employee_attributes = employee_data.pop(0)
+                                    
+                                    
                                     if len(employee_attributes) != 7: #checks that the .csv file has seven columns for instantiation of employee class type
                                         print("\nERROR: Data from .csv file does not match expected input of seven employee attributes, please try again""\n""")
                                         continue
@@ -66,16 +77,23 @@ def main():
                                         for items in employee_data: # this creates the employee objects and assumes that the .csv file has the same columns in the right order (refer to employee class __init__ ordering)
                                             list_of_employees.append(cf.employee(items[0], items[1], items[2],items[3], items[4], items[5], items[6]))
 
-                                        cf.createCalendarRange(calendar_start_date, calendar_end_date, calendar_resource_dict, list_of_employees) #Scheduling app only works based on the Date range of calendar_start date to calendar_end_date
+                                        #CALLING createCalendarRange() FUNCTION TO INITIALISE CALENDAR DATA STRUCTURE
+                                        cf.createCalendarRange(calendar_start_date, calendar_end_date, calendar_resource_dict, list_of_employees) #Resource Tool only works based on the Date range of calendar_start date to calendar_end_date
                                         
                                         break
                             except IOError:
                                 print("\nERROR: Please make sure that:""\n""1).csv file is in the same directory as .py file ""\n""2).csv file is named correctly ""\n""3)Numerical employee attributes are in correct form ""\n""Pls try again""\n""")
                                 continue   
 
+                        
+                        
+                        
                         elif user_option_1 == "2": 
                             
                             if job_database_initialised_count == 0: #Only allows the job.csv file to be loaded once
+                                
+                                
+                                #CREATE FILE OBJECT AND READ .CSV FILE
                                 try:
                                     with open("job.csv", "r", encoding="utf-8") as file:
                                         job_attributes = []
@@ -88,7 +106,8 @@ def main():
                                         if len(job_attributes) != 6:
                                             print("\nERROR: Data from .csv file does not match expected input of six job attributes, please try again""\n""")
                                             continue
-                                        else:                                        
+                                        else:   
+
                                             if calendar_resource_dict == {}:
                                                 print("\n** Please initialise Resource Tool with Employees as a first step before adding scheduled jobs **""\n""")
                                                 break
@@ -104,8 +123,12 @@ def main():
                                                 if items[1] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d'):
                                                     print("Scheduled job starts before Job Scheduling Tool start date of {}, please try again""\n""".format(calendar_start_date))
                                                     break
+                                                
+                                                
+                                                #SCHEDULE JOBS IN THE .CSV FILE INTO THE RESOURCE TOOL
                                                 cf.scheduleJob(items[0], items[1], items[2],items[3], items[4], items[5], calendar_resource_dict, job_id, list_of_jobs)
-                                                job_id += 1
+                                                job_id += 1 #Creates incremental numeric Job ID
+
                                             job_database_initialised_count = 1 #So that the job database will not be initialised twice   
                                             
                                             break                                      
@@ -116,7 +139,7 @@ def main():
                                     continue                                
 
                             else:
-                                print("\nERROR: You have already initialised the Job Database""\n""") 
+                                print("\nERROR: Job Database have already been initialised""\n""") 
                                 break
 
                 except ValueError:
@@ -139,6 +162,8 @@ def main():
             
 
 
+
+        #OPTION 2 SELECTED
         elif user_option == "2": #Add/Remove Employee(s)/Delete Scheduled Job
             user_option_2 = input("\nDo you want to:""\n""1 : Add an employee to database ""\n""2 : Remove an employee from database ""\n""3 : Delete a Scheduled Job \nInput (1), (2) or (3): ")
             if user_option_2 not in ["1", "2", "3"]:
@@ -169,6 +194,7 @@ def main():
                             for i in range(len(employee_details)):
                                 employee_details[i] = employee_details[i].strip()
 
+                            #DATA VALIDITY CHECKS
                             if employee_details[6].lower() not in ["metals", "machinery", "instrument/electrical"]:
                                 print("\nERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical")
                                 user_option_reselect= input("\nDo you want to re-input? Y/N""\n""").lower()
@@ -194,7 +220,7 @@ def main():
                                     print("\nERROR: Employee's Total Hours Per Day cannot be more than 12 Hours\n")
                                     break
                             except ValueError:
-                                print("\nERROR: Please check inputs for Employee Id, Hourly Rate, Total Hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
+                                print("\nERROR: Please check inputs for Employee ID, Hourly Rate, Total Hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
                                 user_option_reselect= input("\nDo you want to re-input employee details? Y/N""\n""").lower()
                                 while True:
                                     if user_option_reselect in ["y", "n"]:
@@ -210,7 +236,7 @@ def main():
                                 try:
                                     employee_details[7] = dt.datetime.strptime(employee_details[7],'%Y-%m-%d')
                                     if employee_details[7] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'): #Checks if employee is only joining past tool working date range
-                                        print("\nEmployee is planned to start past Resource Application workable date of {}, Employee will not be added to Database in this scenario".format(calendar_end_date))
+                                        print("\nEmployee is planned to start past Resource Tool workable date of {}, Employee will not be added to database in this scenario".format(calendar_end_date))
                                         
                                     else:
                                         if employee_details[7] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d'):
@@ -230,6 +256,10 @@ def main():
                                         continue
                                     else:
                                         break
+
+                            #END OF DATA VALIDITY CHECKS
+
+                    #IF ALL DATA IS VALID, CREATE EMPLOYEE OBJECT BY CALLING addEmployee() FUNCTION
                     if employee_input_cleaned == True:
                         employee_already_exist = False
                         for employees in list_of_employees:
@@ -245,6 +275,8 @@ def main():
                 elif user_option_2 == "2": # Remove Employee
                     while True:
                         employee_details = input("\nPlease key in the following (separated by commas) - \nEmployee ID \nLast Day of Work (yyyy-mm-dd) \nInput: ").strip().split(",")
+                        
+                        #DATA VALIDITY CHECKS
                         if len(employee_details) != 2:
                             print("\nERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                             
@@ -269,7 +301,7 @@ def main():
                                 
                                 employee_details[1] = dt.datetime.strptime(employee_details[1],'%Y-%m-%d')
                                 if employee_details[1] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'): #Check if employee is only leaving past tool working date range
-                                    print("\nEmployee's Last Day of Work is past Resource Application workable date of {}, Employee will not be removed from Database in this scenario".format(calendar_end_date))
+                                    print("\nEmployee's Last Day of Work is past Resource Tool workable date of {}, Employee will not be removed from database in this scenario".format(calendar_end_date))
                                     employee_end_before_calendar_end = False
 
                                 if employee_details[1] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d'):
@@ -315,8 +347,11 @@ def main():
                                             
                                             break
                                         else:
-                                            
                                             continue
+
+                        #END OF DATA VALIDITY CHECKS            
+
+                                    #IF ALL DATA IS VALID AND CONDITIONS ARE MET, DELETE EMPLOYEE OBJECT BY CALLING removeEmployee() FUNCTION                                            
                                     if employee_exist_in_database == True and employee_end_before_calendar_end == True:
                                         confirm_deletion = input("\nDo you confirm removal of employee from database with Employee ID: " + str(employee_details[0]) + "? Y/N""\n""").lower()
                                         while True:
@@ -332,7 +367,7 @@ def main():
 
                                             
                                         else:
-                                            print("\nDeletion not confirmed, no action taken by system\n")
+                                            print("\nDeletion not confirmed, no action taken by Resource Tool\n")
                                             break
 
 
@@ -384,7 +419,7 @@ def main():
                                 break
 
                             elif user_input_1 == "n":
-                                print("\nNo action taken by system\n")
+                                print("\nNo action taken by Resource Tool\n")
                                 break
 
                             else:
@@ -398,11 +433,16 @@ def main():
 
 
 
+
+
+        #OPTION 3 SELECTED
         elif user_option == "3": #Schedule a Job
             if calendar_resource_dict == {}:
                 print("\n** Please initialise the Resource Tool with Employees before scheduling any jobs **\n")
             else:
                 user_job_details = input("\nPlease input the following (separated by commas) - \nJob Name, \nStart Date (yyyy-mm-dd), \nDue Date (yyyy-mm-dd), \nResources Required (man-hours), \nTotal cost (dollars), \nCraft Required (Metals, Machinery or Instrument/Electrical) \nInput: ").strip().split(",")
+                
+                #DATA VALIDITY CHECKS
                 if len(user_job_details) != 6:
                     print("\nERROR: You have entered an invalid amount of inputs, Please try again""\n""")
                 else:
@@ -434,8 +474,17 @@ def main():
                             user_job_details[5] = user_job_details[5].lower()
                             if user_job_details[5] not in ["metals", "machinery", "instrument/electrical"]:
                                 print(print("\nERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical\n"))
+                            
+                #END OF DATA VALIDITY CHECKS            
+                            
+                            
+                            
+                            #CALLS scheduleJobCheck() FUNCTION TO SEE IF SCHEDULE IS AVAILABLE, IF NOT AVAILABLE, recommendSchedule() FUNCTION WILL BE CALLED IF USER AGREES 
                             else:
                                 check_results, start_date, due_date = cf.scheduleJobCheck(user_job_details[0],user_job_details[1],user_job_details[2],user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, dt.datetime.strptime(calendar_start_date, '%Y-%m-%d'), dt.datetime.strptime(calendar_end_date, '%Y-%m-%d'))
+                                
+                                
+                                #JOB IS SCHEDULED IF USER APPROVES OF SCHEDULED DATE(S)
                                 if check_results == True:
                                     cf.scheduleJob(user_job_details[0],start_date, due_date,user_job_details[3],user_job_details[4], user_job_details[5], calendar_resource_dict, job_id, list_of_jobs)
                                     job_id += 1
@@ -444,10 +493,10 @@ def main():
 
 
 
-
+        #OPTION 4 SELECTED
         elif user_option == "4": #Data Persistence to Files as well as Cost summary
             while True:
-                user_input = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Find all job details based on a specific Date or by Date Range ""\n"" 2 : Find job details based on Job ID ""\n"" 3 : Total Cost spent on Jobs based on a specific Date or by Date Range ""\n"" 4 : Employee List for a specified Date (takes into account New Hires and Attritions) \nInput (1), (2), (3) or (4): ")
+                user_input = input("\nPlease input a selection between 1 and 4:""\n"" 1 : Find all job details based on a specific date or by Date Range ""\n"" 2 : Find job details based on Job ID ""\n"" 3 : Total Cost spent on Jobs based on a specific date or by Date Range ""\n"" 4 : Employee List for a specified date (takes into account New Hires and Attritions) \nInput (1), (2), (3) or (4): ")
                 if user_input not in ["1", "2", "3", "4"]:
                     while True:
                         user_input = input("\nERROR: You have entered an invalid selection, do you want to re-select? Y/N ""\n""").lower()
@@ -496,7 +545,7 @@ def main():
                                             user_input = input("\nDo you want to save Job details to .csv file? Y/N\n").lower() #Data persistence to .csv
                                             if user_input == "y":
 
-                                                with open("file_output{}.csv".format(file_generation_count), "w", newline="") as f:
+                                                with open("file_output{}.csv".format(file_generation_count), "w", newline="") as f: #with open automatically closes the file once block is fully completed
                                                     fieldnames = ["Date", "Job ID", "Job Name", "Number of Employees", "Craft"]
                                                     writer = csv.DictWriter(f, fieldnames= fieldnames)
                                                     writer.writeheader()
@@ -504,6 +553,7 @@ def main():
                                                         writer.writerow({"Date": start_date_option_4.date(), "Job ID": items.job_id, "Job Name":items.job_name , "Number of Employees": len(items.employees[start_date_option_4]), "Craft": items.craft})
                                                 
                                                 print("\nFile successfully saved to folder\n")
+                                                
                                                 file_generation_count +=1
                                                 break
 
