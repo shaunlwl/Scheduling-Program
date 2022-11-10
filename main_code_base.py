@@ -173,31 +173,17 @@ def main():
             else:
                 
                 if user_option_2 == "1": #Add Employee
-                    employee_input_cleaned = False
-                    while True:
-                        employee_details = input("\nPlease provide the following details (separated by commas) - \nEmployee ID, \nFirst Name, \nLast Name, \nHourly Rate, \nTotal Hours Per Day, \nCompetency, \nCraft, \nEmployee Start Date (yyyy-mm-dd) \nInput: ").strip().split(",")
-                        if len(employee_details) != 8:
-                            print("\nERROR: You have entered an invalid amount of inputs, Please try again""\n""")
-                            user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
-                            while True:
-                                if user_option_reselect in ["y", "n"]:
-                                    break
-                                else:
-                                    user_option_reselect = input("\nERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
-                                    continue
-                            if user_option_reselect == "y":
-                                continue
-                            else:
-                                break
 
-                        else:
-                            for i in range(len(employee_details)):
-                                employee_details[i] = employee_details[i].strip()
+                    if calendar_resource_dict == {}:
+                        print("\n** Please initialise the Resource Tool first **\n")
 
-                            #DATA VALIDITY CHECKS
-                            if employee_details[6].lower() not in ["metals", "machinery", "instrument/electrical"]:
-                                print("\nERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical")
-                                user_option_reselect= input("\nDo you want to re-input? Y/N""\n""").lower()
+                    else:
+                        employee_input_cleaned = False
+                        while True:
+                            employee_details = input("\nPlease provide the following details (separated by commas) - \nEmployee ID, \nFirst Name, \nLast Name, \nHourly Rate, \nTotal Hours Per Day, \nCompetency, \nCraft, \nEmployee Start Date (yyyy-mm-dd) \nInput: ").strip().split(",")
+                            if len(employee_details) != 8:
+                                print("\nERROR: You have entered an invalid amount of inputs, Please try again""\n""")
+                                user_option_reselect = input("Do you want to re-input? Y/N""\n""").lower()
                                 while True:
                                     if user_option_reselect in ["y", "n"]:
                                         break
@@ -208,43 +194,38 @@ def main():
                                     continue
                                 else:
                                     break
-                            try:
-                                employee_details[0] = int(employee_details[0]) #Employee ID variation is allowable due to possible difference in employee type (such as contractor vs full-time), however, has to be integer form
-                                employee_details[3] = float(employee_details[3])
-                                employee_details[4] = float(employee_details[4])
-                                employee_details[5] = float(employee_details[5])
-                                if employee_details[3] < 0 or employee_details[4] < 0 or employee_details[5] < 0:
-                                    print("\nERROR: Employee details for Hourly Rate, Total Hours Per Day and Competency are expected to be more than 0, Please try again\n")
-                                    break
-                                if employee_details[4] > 12:
-                                    print("\nERROR: Employee's Total Hours Per Day cannot be more than 12 Hours\n")
-                                    break
-                            except ValueError:
-                                print("\nERROR: Please check inputs for Employee ID, Hourly Rate, Total Hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
-                                user_option_reselect= input("\nDo you want to re-input employee details? Y/N""\n""").lower()
-                                while True:
-                                    if user_option_reselect in ["y", "n"]:
-                                        break
-                                    else:
-                                        user_option_reselect = input("\nERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
-                                        continue
-                                if user_option_reselect == "y":
-                                    continue
-                                else:
-                                    break
+
                             else:
+                                for i in range(len(employee_details)):
+                                    employee_details[i] = employee_details[i].strip()
+
+                                #DATA VALIDITY CHECKS
+                                if employee_details[6].lower() not in ["metals", "machinery", "instrument/electrical"]:
+                                    print("\nERROR: You have entered an invalid employee craft, Please ensure that crafts are one of these: Metals, Machinery or Instrument/Electrical")
+                                    user_option_reselect= input("\nDo you want to re-input? Y/N""\n""").lower()
+                                    while True:
+                                        if user_option_reselect in ["y", "n"]:
+                                            break
+                                        else:
+                                            user_option_reselect = input("\nERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
+                                            continue
+                                    if user_option_reselect == "y":
+                                        continue
+                                    else:
+                                        break
                                 try:
-                                    employee_details[7] = dt.datetime.strptime(employee_details[7],'%Y-%m-%d')
-                                    if employee_details[7] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'): #Checks if employee is only joining past tool working date range
-                                        print("\nEmployee is planned to start past Resource Tool workable date of {}, Employee will not be added to database in this scenario".format(calendar_end_date))
-                                        
-                                    else:
-                                        if employee_details[7] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d'):
-                                            employee_details[7] = dt.datetime.strptime(calendar_start_date,'%Y-%m-%d')
-                                        employee_input_cleaned = True
-                                    break
+                                    employee_details[0] = int(employee_details[0]) #Employee ID variation is allowable due to possible difference in employee type (such as contractor vs full-time), however, has to be integer form
+                                    employee_details[3] = float(employee_details[3])
+                                    employee_details[4] = float(employee_details[4])
+                                    employee_details[5] = float(employee_details[5])
+                                    if employee_details[3] < 0 or employee_details[4] < 0 or employee_details[5] < 0:
+                                        print("\nERROR: Employee details for Hourly Rate, Total Hours Per Day and Competency are expected to be more than 0, Please try again\n")
+                                        break
+                                    if employee_details[4] > 12:
+                                        print("\nERROR: Employee's Total Hours Per Day cannot be more than 12 Hours\n")
+                                        break
                                 except ValueError:
-                                    print("\nERROR: You have entered an invalid date format for Employee Start Date, Please try again""\n""")
+                                    print("\nERROR: Please check inputs for Employee ID, Hourly Rate, Total Hours Per Day and Competency and ensure that those are inputted as numerical digits, Please try again""\n""")
                                     user_option_reselect= input("\nDo you want to re-input employee details? Y/N""\n""").lower()
                                     while True:
                                         if user_option_reselect in ["y", "n"]:
@@ -256,19 +237,43 @@ def main():
                                         continue
                                     else:
                                         break
+                                else:
+                                    try:
+                                        employee_details[7] = dt.datetime.strptime(employee_details[7],'%Y-%m-%d')
+                                        if employee_details[7] > dt.datetime.strptime(calendar_end_date,'%Y-%m-%d'): #Checks if employee is only joining past tool working date range
+                                            print("\nEmployee is planned to start past Resource Tool workable date of {}, Employee will not be added to database in this scenario".format(calendar_end_date))
+                                            
+                                        else:
+                                            if employee_details[7] < dt.datetime.strptime(calendar_start_date,'%Y-%m-%d'):
+                                                employee_details[7] = dt.datetime.strptime(calendar_start_date,'%Y-%m-%d')
+                                            employee_input_cleaned = True
+                                        break
+                                    except ValueError:
+                                        print("\nERROR: You have entered an invalid date format for Employee Start Date, Please try again""\n""")
+                                        user_option_reselect= input("\nDo you want to re-input employee details? Y/N""\n""").lower()
+                                        while True:
+                                            if user_option_reselect in ["y", "n"]:
+                                                break
+                                            else:
+                                                user_option_reselect = input("\nERROR: You have entered an invalid selection, Do you want to re-input employee details? Y/N""\n""").lower()
+                                                continue
+                                        if user_option_reselect == "y":
+                                            continue
+                                        else:
+                                            break
 
-                            #END OF DATA VALIDITY CHECKS
+                                #END OF DATA VALIDITY CHECKS
 
-                    #IF ALL DATA IS VALID, CREATE EMPLOYEE OBJECT BY CALLING addEmployee() FUNCTION
-                    if employee_input_cleaned == True:
-                        employee_already_exist = False
-                        for employees in list_of_employees:
-                            if employee_details[0] == employees.getEmpId():
-                                print("\nEmployee with ID: {} already exist in database\n".format(employee_details[0]))
-                                employee_already_exist = True
-                        if employee_already_exist == False:
-                            cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_new_employees, calendar_resource_dict, calendar_end_date)                   
-                        
+                        #IF ALL DATA IS VALID, CREATE EMPLOYEE OBJECT BY CALLING addEmployee() FUNCTION
+                        if employee_input_cleaned == True:
+                            employee_already_exist = False
+                            for employees in list_of_employees:
+                                if employee_details[0] == employees.getEmpId():
+                                    print("\nEmployee with ID: {} already exist in database\n".format(employee_details[0]))
+                                    employee_already_exist = True
+                            if employee_already_exist == False:
+                                cf.employee.addEmployee(employee_details[0],employee_details[1],employee_details[2],employee_details[3],employee_details[4],employee_details[5],employee_details[6],employee_details[7], list_of_new_employees, calendar_resource_dict, calendar_end_date)                   
+                            
 
 
 
@@ -391,45 +396,47 @@ def main():
 
 
                 else: # Delete Scheduled Job
-                    
-                    user_input = input("\nPlease provide ID (e.g. #1010) of Job to be deleted:""\n""").strip()
-                    job_exist = False
-                    index = 0
-                    if len(list_of_jobs) != 0:
-                        for jobs in list_of_jobs: #Check if Job exists in database
-                            if user_input == jobs.job_id:
-                                job_exist = True
-                                break
-                            index +=1
-
-                    if job_exist == True:
-                        while True:
-                            user_input_1 = input("\nJob identified in database. Do you confirm Job deletion? Y/N""\n""").lower()
-                            
-                            if user_input_1 == "y":
-
-                                for dates in list_of_jobs[index].employees:
-                                    for employees in list_of_jobs[index].employees[dates]: #{emp_id : total hours allocated}
-                                        for resource in calendar_resource_dict[dates]:
-                                            if list(resource.keys())[0] == list(employees.keys())[0]:
-                                                resource[list(resource.keys())[0]] = list(resource.values())[0] + list(employees.values())[0]
-                                del list_of_jobs[index]
-                                print("\nJob has been successfully deleted\n")
-                                
-                                break
-
-                            elif user_input_1 == "n":
-                                print("\nNo action taken by Resource Tool\n")
-                                break
-
-                            else:
-                                print("\nERROR: You have entered an invalid input, Please try again""\n""")
-                                continue
-
-
+                    if calendar_resource_dict == {}:
+                        print("\n** Please initialise the Resource Tool first **\n")
                     else:
-                        print("\nJob does not exist in database""\n""")
-            
+                        user_input = input("\nPlease provide ID (e.g. #1010) of Job to be deleted:""\n""").strip()
+                        job_exist = False
+                        index = 0
+                        if len(list_of_jobs) != 0:
+                            for jobs in list_of_jobs: #Check if Job exists in database
+                                if user_input == jobs.job_id:
+                                    job_exist = True
+                                    break
+                                index +=1
+
+                        if job_exist == True:
+                            while True:
+                                user_input_1 = input("\nJob identified in database. Do you confirm Job deletion? Y/N""\n""").lower()
+                                
+                                if user_input_1 == "y":
+
+                                    for dates in list_of_jobs[index].employees:
+                                        for employees in list_of_jobs[index].employees[dates]: #{emp_id : total hours allocated}
+                                            for resource in calendar_resource_dict[dates]:
+                                                if list(resource.keys())[0] == list(employees.keys())[0]:
+                                                    resource[list(resource.keys())[0]] = list(resource.values())[0] + list(employees.values())[0]
+                                    del list_of_jobs[index]
+                                    print("\nJob has been successfully deleted\n")
+                                    
+                                    break
+
+                                elif user_input_1 == "n":
+                                    print("\nNo action taken by Resource Tool\n")
+                                    break
+
+                                else:
+                                    print("\nERROR: You have entered an invalid input, Please try again""\n""")
+                                    continue
+
+
+                        else:
+                            print("\nJob does not exist in database""\n""")
+                
 
 
 
@@ -800,7 +807,7 @@ def main():
 
 
 
-                    if user_input == "4": #Employee List for a specified Date (takes into account New Additions and Attritions)
+                    if user_input == "4": #Employee List for a specified date (takes into account New Additions and Attritions)
                         date_input = input("\nPlease input date in this format: yyyy-mm-dd\nInput: ").strip()
                         
                         try:
