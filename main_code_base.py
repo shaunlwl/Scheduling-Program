@@ -62,7 +62,7 @@ def main():
                         if user_option_1 == "1": 
                             #CREATE FILE OBJECT AND READ .CSV FILE
                             try:
-                                with open("employee.csv", "r", encoding="utf-8") as file:
+                                with open("data\employee.csv", "r", encoding="utf-8") as file:
                                     employee_attributes = []
                                     employee_data = []
                                     for line in file:
@@ -95,7 +95,7 @@ def main():
                                 
                                 #CREATE FILE OBJECT AND READ .CSV FILE
                                 try:
-                                    with open("job.csv", "r", encoding="utf-8") as file:
+                                    with open("data\job.csv", "r", encoding="utf-8") as file:
                                         job_attributes = []
                                         job_data = []
                                         for line in file:
